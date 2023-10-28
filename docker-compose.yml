@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  app:
+    build: "."
+    command: "npm run start"
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=production
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+
+  db:
+    build: ./database/.
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=my_user
+      - POSTGRES_PASSWORD=my_pwd
+      - POSTGRES_DB=my_db
+    ports:
+      - "5432:5432"
