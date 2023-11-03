@@ -1,6 +1,16 @@
-version: '3'
+version: '3.7'
 
 services:
+  db:
+    build: ./database/.
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=my_user
+      - POSTGRES_PASSWORD=my_pwd
+      - POSTGRES_DB=my_db
+    ports:
+      - "5432:5432"
+
   app:
     build: "."
     command: "npm run start"
@@ -11,13 +21,3 @@ services:
       - "8080"
     ports:
       - "8080:8080"
-
-  db:
-    build: ./database/.
-    container_name: postgres
-    environment:
-      - POSTGRES_USER=my_user
-      - POSTGRES_PASSWORD=my_pwd
-      - POSTGRES_DB=my_db
-    ports:
-      - "5432:5432"
