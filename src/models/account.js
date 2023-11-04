@@ -1,5 +1,5 @@
-const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../db_connection");
+const { DataTypes, Model } = require("sequelize");
 
 class Account extends Model {}
 
@@ -26,4 +26,4 @@ Account.init({
     timestamps: false
 });
 
-module.exports = Account
+module.exports = Account;

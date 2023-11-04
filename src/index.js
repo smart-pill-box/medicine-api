@@ -4,10 +4,10 @@ const { createTransaction, rollbackTransaction } = require("./midlewares/transac
 const accountRoutes = require("./routes/account_routes");
 const server = fastify();
 
-server.setErrorHandler((err, req, resp)=>{
-  console.error("Error ocurred:", err);
-  resp.code(500).send("Internal Server Error");
-});
+// server.setErrorHandler((err, req, resp)=>{
+//   console.error("Error ocurred:", err);
+//   resp.code(500).send("Internal Server Error");
+// });
 
 server.addHook("onRequest", createTransaction);
 server.addHook("onError", rollbackTransaction);

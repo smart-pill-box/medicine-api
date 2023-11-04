@@ -1,16 +1,45 @@
 const { v4: uuidv4 } = require('uuid');
-const { Account } = require("../models");
+const { Account, Profile } = require("../models");
+const AccountDto = require("../dtos/account_dto");
 
 async function accountRoutes(server){
-    server.get("/account", async (req, resp)=>{
-        const jane = await Account.create({
-            accountKey: uuidv4(),
-            mainProfileKey: uuidv4()
-        });
+    server.post(
+        "/account",
+        {
+            schema: {
+                body: {
+                    type: "object",
+                    properties: {
+                        mainProfileName: {
+                            type: "string",
+                            minLength: 1,
+                            maxLength: 255
+                        }
+                    },
+                    required: [
+                        "mainProfileName"
+                    ]
+                }
+            }
+        },
+        async (req, resp)=>{
+            const mainProfileKey = uuidv4();
 
-        req.transaction.commit();
+            const newAccount = await Account.create({
+                accountKey: uuidv4(),
+                mainProfileKey: mainProfileKey,
+            });
 
-        return jane
+            const mainProfile = await newAccount.createProfile({
+                name: req.body.mainProfileName,
+                profileKey: mainProfileKey,
+            });
+
+            await newAccount.addProfile(mainProfile);
+
+            req.transaction.commit();
+
+            resp.status(201).send(AccountDto.toClientResponse(newAccount));
     }); 
 }
 
