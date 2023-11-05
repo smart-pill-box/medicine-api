@@ -1,5 +1,7 @@
-class ProfileDto {
-    static toClientResponse(profile) {
+import { Profile } from "../models";
+
+export class ProfileDto {
+    static toClientResponse(profile: Profile) {
         const { profileKey, name } = profile;
         return {
             profileKey: profileKey,
@@ -7,5 +9,3 @@ class ProfileDto {
         };
     }
 }
-
-module.exports = ProfileDto;

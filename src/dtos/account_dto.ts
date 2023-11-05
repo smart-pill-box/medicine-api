@@ -1,10 +1,9 @@
-const ProfileDto = require("./profile_dto")
+import { Account } from "../models";
+import { ProfileDto } from "./profile_dto";
 
-class AccountDto {
-    static toClientResponse(account) {
+export class AccountDto {
+    static toClientResponse(account: Account) {
         const { accountKey, mainProfileKey } = account;
-        console.log(account.toJSON());
-        console.log(account.profiles);
         const profiles = account.profiles.map((profile)=>{
             return ProfileDto.toClientResponse(profile)
         });
@@ -16,5 +15,3 @@ class AccountDto {
         };
     }
 }
-
-module.exports = AccountDto;
