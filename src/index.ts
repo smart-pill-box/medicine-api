@@ -3,8 +3,50 @@ import fastify, { FastifyInstance } from "fastify";
 import { AppDataSource } from "./db_connection";
 import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts'
 import { accountRoutes } from "./routes/account_routes";
+import Ajv from "ajv"
 
-const server: FastifyInstance = fastify().withTypeProvider<JsonSchemaToTsProvider>();
+interface SchemaCompilers {
+  body: Ajv;
+  params: Ajv;
+  querystring: Ajv;
+  headers: Ajv;
+}
+
+export const server: FastifyInstance = fastify().withTypeProvider<JsonSchemaToTsProvider>();
+
+const schemaCompilers: SchemaCompilers = {
+  body: new Ajv({
+    removeAdditional: false,
+    coerceTypes: true,
+    allErrors: true
+  }),
+  params: new Ajv({
+    removeAdditional: false,
+    coerceTypes: true,
+    allErrors: true
+  }),
+  querystring: new Ajv({
+    removeAdditional: false,
+    coerceTypes: true,
+    allErrors: true
+  }),
+  headers: new Ajv({
+    removeAdditional: false,
+    coerceTypes: true,
+    allErrors: true
+  })
+}
+
+server.setValidatorCompiler(req => {
+    if (!req.httpPart) {
+      throw new Error('Missing httpPart')
+    }
+    const compiler = schemaCompilers[req.httpPart as keyof SchemaCompilers]
+    if (!compiler) {
+      throw new Error(`Missing compiler for ${req.httpPart}`)
+    }
+    return compiler.compile(req.schema)
+})
 
 // server.addHook("onRequest", createTransaction);
 // server.addHook("onError", rollbackTransaction);

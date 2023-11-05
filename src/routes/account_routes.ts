@@ -6,7 +6,7 @@ import { Account } from '../models';
 import { Profile } from '../models';
 import { AccountDto } from '../dtos/account_dto';
 
-const createAccountSchema =  {
+const createAccountBodySchema =  {
     type: "object",
     properties: {
         mainProfileName: {
@@ -17,15 +17,59 @@ const createAccountSchema =  {
     },
     required: [
         "mainProfileName"
-    ]
+    ],
+    additionalProperties: false
+} as const;
+
+const getAccounParamsSchema = {
+    type: "object",
+    properties: {
+        accountKey: {
+            type: "string",
+            minLength: 36,
+            maxLength: 36
+        }
+    },
+    required: ["accountKey"],
+    additionalProperties: false
 } as const;
 
 export async function accountRoutes(server: FastifyInstance){
-    server.post<{ Body: FromSchema<typeof createAccountSchema> }>(
+    const accountRepository = AppDataSource.getRepository(Account);
+    const profileRepository = AppDataSource.getRepository(Profile);
+
+    server.get<{ Params: FromSchema<typeof getAccounParamsSchema> }>(
+        "/account/:accountKey",
+        {
+            schema: {
+                params: getAccounParamsSchema
+            }
+        },
+        async (req, resp)=>{
+
+            const { accountKey } = req.params;
+            const account = await accountRepository.findOne({
+                where: {
+                    accountKey: accountKey
+                },
+                relations: {
+                    profiles: true
+                }
+            });
+
+            if (!account) {
+                resp.status(404).send();
+                return
+            }
+
+            resp.status(200).send(AccountDto.toClientResponse(account));
+        })
+
+    server.post<{ Body: FromSchema<typeof createAccountBodySchema> }>(
         "/account",
         {
             schema: {
-                body: createAccountSchema
+                body: createAccountBodySchema
             }
         },
         async (req, resp)=>{
@@ -41,7 +85,7 @@ export async function accountRoutes(server: FastifyInstance){
             mainProfile.name = mainProfileName;            
             
             newAccount.profiles = [mainProfile];
-            await AppDataSource.manager.save(newAccount);
+            await accountRepository.save(newAccount);
             
             resp.status(201).send(AccountDto.toClientResponse(newAccount));
     }); 
