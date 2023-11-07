@@ -3,6 +3,7 @@ import fastify, { FastifyInstance } from "fastify";
 import { AppDataSource } from "./db_connection";
 import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts'
 import { accountRoutes } from "./routes/account_routes";
+import CustomError from "./errors/custom_error";
 import Ajv from "ajv"
 
 interface SchemaCompilers {
@@ -46,6 +47,28 @@ server.setValidatorCompiler(req => {
       throw new Error(`Missing compiler for ${req.httpPart}`)
     }
     return compiler.compile(req.schema)
+})
+
+server.setErrorHandler((err, req, resp)=>{
+  if (err instanceof CustomError){
+    resp.status(err.statusCode).send({
+      code: err.code,
+      description: err.description
+    });
+  }
+  else if (err.validation) {
+    resp.status(400).send({
+      code: "SCHEMA_ERR",
+      description: err.validation
+    });
+  }
+  else {
+    console.error(`Unexpected internal error ${err}`);
+    resp.status(500).send({
+      code: "INT_ERR",
+      description: "Internal Error, sorry about that"
+    })
+  }
 })
 
 // server.addHook("onRequest", createTransaction);
