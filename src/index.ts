@@ -49,33 +49,48 @@ server.setValidatorCompiler(req => {
     return compiler.compile(req.schema)
 })
 
-server.setErrorHandler((err, req, resp)=>{
-  if (err instanceof CustomError){
-    resp.status(err.statusCode).send({
-      code: err.code,
-      description: err.description
-    });
-  }
-  else if (err.validation) {
-    resp.status(400).send({
-      code: "SCHEMA_ERR",
-      description: err.validation
-    });
-  }
-  else {
-    console.error(`Unexpected internal error ${err}`);
-    resp.status(500).send({
-      code: "INT_ERR",
-      description: "Internal Error, sorry about that"
-    })
-  }
-})
-
-// server.addHook("onRequest", createTransaction);
-// server.addHook("onError", rollbackTransaction);
-
 AppDataSource.initialize()
   .then(() => {
+    server.setErrorHandler(async (err, req, resp)=>{
+      await req.transaction.rollbackTransaction();
+
+      if (err instanceof CustomError){
+        resp.status(err.statusCode).send({
+          code: err.code,
+          description: err.description
+        });
+      }
+      else if (err.validation) {
+        resp.status(400).send({
+          code: "SCHEMA_ERR",
+          description: err.validation
+        });
+      }
+      else {
+        console.error(`Unexpected internal error ${err}`);
+        resp.status(500).send({
+          code: "INT_ERR",
+          description: "Internal Error, sorry about that"
+        })
+      }
+    })
+
+    server.addHook("preParsing", async (req, resp)=>{
+      const queryRunner = AppDataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+  
+      req.transaction = queryRunner;
+  
+    });
+
+    server.addHook("onResponse", async (req, resp) => {
+      if (resp.statusCode < 300){
+        await req.transaction.commitTransaction();
+      }
+      await req.transaction.release();
+    });
+  
     server.register(accountRoutes);
 
     server.listen({ port: 8080, host: "0.0.0.0" })

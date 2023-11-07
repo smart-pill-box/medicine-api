@@ -2,7 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { FromSchema } from "json-schema-to-ts";
 import { AccountDto } from '../dtos/account_dto';
 import { getAccounParamsSchema, createAccountBodySchema } from '../schemas/account_schemas';
-import { getAccount, createAccount } from "../controllers/account_controller"
+import AccountController from '../controllers/account_controller';
 
 export async function accountRoutes(server: FastifyInstance){
     server.get<{ Params: FromSchema<typeof getAccounParamsSchema> }>(
@@ -13,7 +13,9 @@ export async function accountRoutes(server: FastifyInstance){
             }
         },
         async (req, resp)=>{
-            const account = await getAccount(req.params);
+            const accountController = new AccountController(req.transaction);
+
+            const account = await accountController.getAccount(req.params);
             resp.status(200).send(AccountDto.toClientResponse(account));
         })
 
@@ -25,7 +27,8 @@ export async function accountRoutes(server: FastifyInstance){
             }
         },
         async (req, resp)=>{
-            const newAccount = await createAccount(req.body);
+            const accountController = new AccountController(req.transaction);
+            const newAccount = await accountController.createAccount(req.body);
 
             resp.status(201).send(AccountDto.toClientResponse(newAccount));
     }); 

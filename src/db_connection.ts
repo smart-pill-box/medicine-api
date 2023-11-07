@@ -9,6 +9,6 @@ export const AppDataSource = new DataSource({
     password: "my_pwd",
     database: "my_db",
     synchronize: false,
-    logging: false,
+    logging: true,
     entities: [Account, Profile],
 });
