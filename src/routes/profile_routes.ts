@@ -1,17 +1,15 @@
 import { FastifyInstance } from 'fastify';
 import { FromSchema } from "json-schema-to-ts";
-import { getProfileParamsSchema, createProfileBodySchema, createProfileParamsSchema, getProfileDevicesParamsSchema } from '../schemas/profile_schemas';
+import { createProfileSchema, getProfileSchema, getProfileDevicesSchema } from '../schemas/profile_schemas';
 import ProfileController from '../controllers/profile_controller';
 import { ProfileDto } from '../dtos/profile_dto';
 import { DeviceDto } from '../dtos/device_dto';
 
 export async function profileRoutes(server: FastifyInstance){
-    server.get<{ Params: FromSchema<typeof getProfileParamsSchema> }>(
+    server.get<{ Params: FromSchema<typeof getProfileSchema.params> }>(
         "/account/:accountKey/profile/:profileKey",
         {
-            schema: {
-                params: getProfileParamsSchema
-            }
+            schema: getProfileSchema
         },
         async (req, resp)=>{
             const profileController = new ProfileController(req.transaction)
@@ -23,12 +21,10 @@ export async function profileRoutes(server: FastifyInstance){
             );
         })
 
-    server.get<{ Params: FromSchema<typeof getProfileDevicesParamsSchema> }>(
+    server.get<{ Params: FromSchema<typeof getProfileDevicesSchema.params> }>(
         "/account/:accountKey/profile/:profileKey/profile_devices",
         {
-            schema: {
-                params: getProfileDevicesParamsSchema
-            }
+            schema: getProfileDevicesSchema
         },
         async (req, resp)=>{
             const profileController = new ProfileController(req.transaction);
@@ -49,15 +45,12 @@ export async function profileRoutes(server: FastifyInstance){
     )
 
     server.post<{
-        Params: FromSchema<typeof createProfileParamsSchema>,
-        Body: FromSchema<typeof createProfileBodySchema>
+        Params: FromSchema<typeof createProfileSchema.params>,
+        Body: FromSchema<typeof createProfileSchema.body>
     }>(
         "/account/:accountKey/profile",
         {
-            schema: {
-                body: createProfileBodySchema,
-                params: createProfileParamsSchema
-            }
+            schema: createProfileSchema
         },
         async (req, resp)=>{
             const profileController = new ProfileController(req.transaction)

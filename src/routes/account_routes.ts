@@ -1,16 +1,14 @@
 import { FastifyInstance } from 'fastify';
 import { FromSchema } from "json-schema-to-ts";
 import { AccountDto } from '../dtos/account_dto';
-import { getAccounParamsSchema, createAccountBodySchema } from '../schemas/account_schemas';
+import { getAccountSchema, createAccountSchema } from '../schemas/account_schemas';
 import AccountController from '../controllers/account_controller';
 
 export async function accountRoutes(server: FastifyInstance){
-    server.get<{ Params: FromSchema<typeof getAccounParamsSchema> }>(
+    server.get<{ Params: FromSchema<typeof getAccountSchema.params> }>(
         "/account/:accountKey",
         {
-            schema: {
-                params: getAccounParamsSchema
-            }
+            schema: getAccountSchema
         },
         async (req, resp)=>{
             const accountController = new AccountController(req.transaction);
@@ -19,12 +17,10 @@ export async function accountRoutes(server: FastifyInstance){
             resp.status(200).send(AccountDto.toClientResponse(account));
         })
 
-    server.post<{ Body: FromSchema<typeof createAccountBodySchema> }>(
+    server.post<{ Body: FromSchema<typeof createAccountSchema.body> }>(
         "/account",
         {
-            schema: {
-                body: createAccountBodySchema
-            }
+            schema: createAccountSchema
         },
         async (req, resp)=>{
             const accountController = new AccountController(req.transaction);

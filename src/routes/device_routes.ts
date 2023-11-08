@@ -1,16 +1,14 @@
 import { FastifyInstance } from 'fastify';
 import { FromSchema } from "json-schema-to-ts";
-import { createDeviceBodySchema, getDeviceParamsSchema } from '../schemas/device_schemas';
+import { createDeviceSchema, getDeviceSchema } from '../schemas/device_schemas';
 import DeviceController from '../controllers/device_controller';
 import { DeviceDto } from '../dtos/device_dto';
 
 export async function deviceRoutes(server: FastifyInstance){
-    server.get<{ Params: FromSchema<typeof getDeviceParamsSchema> }>(
+    server.get<{ Params: FromSchema<typeof getDeviceSchema.params> }>(
         "/device/:deviceKey",
         {
-            schema: {
-                params: getDeviceParamsSchema
-            }
+            schema: getDeviceSchema
         },
         async (req, resp)=>{
             const deviceController = new DeviceController(req.transaction);
@@ -20,12 +18,10 @@ export async function deviceRoutes(server: FastifyInstance){
             resp.status(200).send(DeviceDto.toClientResponse(device));
         })
 
-    server.post<{ Body: FromSchema<typeof createDeviceBodySchema> }>(
+    server.post<{ Body: FromSchema<typeof createDeviceSchema.body> }>(
         "/device",
         {
-            schema: {
-                body: createDeviceBodySchema
-            }
+            schema: createDeviceSchema
         },
         async (req, resp)=>{
             const deviceController = new DeviceController(req.transaction);
