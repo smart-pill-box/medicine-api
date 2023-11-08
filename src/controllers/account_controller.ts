@@ -40,11 +40,11 @@ export default class AccountController {
 
         const mainProfile = new Profile();
         mainProfile.profileKey = mainProfileKey;
-        mainProfile.name = mainProfileName;            
+        mainProfile.name = mainProfileName;
         
         newAccount.profiles = [mainProfile];
         await this.transaction.manager.save(newAccount);
         
-        return newAccount
+        return newAccount;
     } 
 }

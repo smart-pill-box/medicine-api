@@ -15,7 +15,7 @@ describe("Account routes", async ()=>{
             expect(response.body).toBeDefined();
         });
         it("Create account and profile in DB", async () => {
-            const account = await createAccount()
+            const account = await createAccount();
         
             let accountKey = account.accountKey;
             let mainProfileKey = account.profiles[0].profileKey;

@@ -1,7 +1,7 @@
 const { describe } = require("node:test");
 const { v4:uuidv4 } = require("uuid");
-const { createAccount, createProfile } = require("../utils/object_generator");
-const { getProfile, postProfile, getAccount } = require("../utils/route_generator");
+const { createAccount, createProfile, createDevice, createProfileDevice } = require("../utils/object_generator");
+const { getProfile, postProfile, getAccount, getProfileDevices } = require("../utils/route_generator");
 const { createProfileBody } = require("../utils/body_generator");
 
 describe("Profile Routes", async ()=>{
@@ -89,5 +89,28 @@ describe("Profile Routes", async ()=>{
             expect(response.status).toBe(200);
             expect(response.body.profileKey).toBe(profile.profileKey);
         });
+    });
+    describe("GET /account/:accountKey/profile/:profileKey/profile_account", async () => {
+        it("Show only the devices the profile have", async ()=>{
+            const device1 = await createDevice();
+            const device2 = await createDevice();
+
+            const { accountKey } = await createAccount();
+            const { profileKey } = await createProfile(accountKey);
+
+            let response = await getProfileDevices(accountKey, profileKey);
+            expect(response.status).toBe(200);
+            expect(response.body.data.length).toBe(0);
+
+            await createProfileDevice(accountKey, profileKey, device1.deviceKey);
+
+            response = await getProfileDevices(accountKey, profileKey);
+
+            expect(response.status).toBe(200);
+            expect(response.body.data.length).toBe(1);
+            expect(response.body.data[0].deviceKey).toBe(device1.deviceKey);
+
+        });
     })
+
 })

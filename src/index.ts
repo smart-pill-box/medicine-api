@@ -7,6 +7,7 @@ import CustomError from "./errors/custom_error";
 import Ajv from "ajv"
 import { profileRoutes } from "./routes/profile_routes";
 import { deviceRoutes } from "./routes/device_routes";
+import { profileDeviceRoutes } from "./routes/profile_device_routes";
 
 interface SchemaCompilers {
   body: Ajv;
@@ -86,7 +87,7 @@ AppDataSource.initialize()
   
     });
 
-    server.addHook("onResponse", async (req, resp) => {
+    server.addHook("onSend", async (req, resp) => {
       if (resp.statusCode < 300){
         await req.transaction.commitTransaction();
       }
@@ -96,6 +97,7 @@ AppDataSource.initialize()
     server.register(accountRoutes);
     server.register(profileRoutes);
     server.register(deviceRoutes);
+    server.register(profileDeviceRoutes);
 
     server.listen({ port: 8080, host: "0.0.0.0" })
       .then((address) => console.log(`server listening on ${address}`))

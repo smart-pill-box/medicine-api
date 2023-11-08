@@ -30,7 +30,7 @@ export async function deviceRoutes(server: FastifyInstance){
         async (req, resp)=>{
             const deviceController = new DeviceController(req.transaction);
 
-            const device = await deviceController.createdevice(req.body);
+            const device = await deviceController.createDevice(req.body);
 
             resp.status(201).send(DeviceDto.toClientResponse(device));
     }); 

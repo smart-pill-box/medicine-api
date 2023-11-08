@@ -28,8 +28,15 @@ function createDeviceBody(deviceKey=null){
     }
 };
 
+function createProfileDeviceBody(deviceKey){
+    return {
+        deviceKey: deviceKey
+    }
+};
+
 module.exports = {
     createAccountBody,
     createProfileBody,
-    createDeviceBody
+    createDeviceBody,
+    createProfileDeviceBody
 }

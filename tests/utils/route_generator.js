@@ -37,11 +37,29 @@ async function postDevice(body){
     return response
 };
 
+async function postProfileDevice(accountKey, profileKey, body){
+    const response = await request.post(
+        `/account/${accountKey}/profile/${profileKey}/profile_device`
+    ).send(body);
+
+    return response;
+};
+
+async function getProfileDevices(accountKey, profileKey){
+    const response = await request.get(
+        `/account/${accountKey}/profile/${profileKey}/profile_devices`
+    )
+
+    return response
+}
+
 module.exports = {
     postAccount,
     getAccount,
     postProfile,
     getProfile,
+    getProfileDevices,
     getDevice,
-    postDevice
+    postDevice,
+    postProfileDevice,
 }

@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne } from "typeorm";
 import { Account, Profile, Device } from "."; // Assuming Account is exported as a default export
 
-@Entity({ name: "profile" })
+@Entity({ name: "profile_device" })
 export class ProfileDevice {
     @PrimaryGeneratedColumn({ type: "integer", name: "id" })
     id: number;
@@ -19,8 +19,5 @@ export class ProfileDevice {
     })
     @JoinColumn({ name: "profile_id" })
     profile: Profile;
-
-    @Column({ type: "varchar", length: 255, name: "name" })
-    name: string;
 }
 

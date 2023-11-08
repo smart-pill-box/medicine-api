@@ -26,7 +26,7 @@ export default class DeviceController {
         return device;
     }
 
-    public async createdevice({ deviceKey }: FromSchema<typeof createDeviceBodySchema>): Promise<Device>{
+    public async createDevice({ deviceKey }: FromSchema<typeof createDeviceBodySchema>): Promise<Device>{
 
         const newDevice = new Device();
         newDevice.deviceKey = deviceKey;

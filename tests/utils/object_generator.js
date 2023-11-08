@@ -1,5 +1,5 @@
-const { createAccountBody, createProfileBody, createDeviceBody } =  require("./body_generator");
-const { postAccount, postProfile, postDevice } =  require("./route_generator");
+const { createAccountBody, createProfileBody, createDeviceBody, createProfileDeviceBody } =  require("./body_generator");
+const { postAccount, postProfile, postDevice, postProfileDevice } =  require("./route_generator");
 
 
 async function createAccount(mainProfileName=null){
@@ -29,8 +29,18 @@ async function createDevice(deviceKey=null){
     return response.body;
 };
 
+async function createProfileDevice(accountKey, profileKey, deviceKey){
+    const body = createProfileDeviceBody(deviceKey);
+    const response = await postProfileDevice(accountKey, profileKey, body);
+
+    expect(response.status).toBe(201);
+
+    return response.body;
+}
+
 module.exports = {
     createAccount,
     createProfile,
-    createDevice
+    createDevice,
+    createProfileDevice
 }

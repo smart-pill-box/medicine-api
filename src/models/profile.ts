@@ -18,7 +18,7 @@ export class Profile {
         nullable: false,
         cascade: ["insert", "update"]
     })
-    profileDevices: ProfileDevice;
+    profileDevices: ProfileDevice[];
 
     @Column({ type: "char", length: 36, name: "profile_key" })
     profileKey: string;
