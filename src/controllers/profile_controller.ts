@@ -1,5 +1,5 @@
 import { QueryRunner } from "typeorm";
-import { createProfileBodySchema } from "../schemas/profile_schemas";
+import { createProfileSchema } from "../schemas/profile_schemas";
 import { FromSchema } from "json-schema-to-ts";
 import { Account, Device, Profile } from "../models";
 import { v4 as uuidv4 } from "uuid"
@@ -15,7 +15,7 @@ export default class ProfileController {
     public async createProfile(accounKey: string,
     {
         name
-    }: FromSchema<typeof createProfileBodySchema>) {
+    }: FromSchema<typeof createProfileSchema.body>) {
         const account = await this.transaction.manager.findOne(Account, {
             where: {
                 accountKey: accounKey

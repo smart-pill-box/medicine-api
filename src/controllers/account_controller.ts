@@ -1,6 +1,6 @@
 import { Account, Profile } from '../models';
 import { FromSchema } from "json-schema-to-ts";
-import { getAccounParamsSchema, createAccountBodySchema } from "../schemas/account_schemas";
+import { createAccountSchema } from "../schemas/account_schemas";
 import { NotFoundAccount } from "../errors/custom_errors";
 import { v4 as uuidv4 } from 'uuid';
 import { QueryRunner } from "typeorm";
@@ -30,7 +30,7 @@ export default class AccountController {
         return account;
     }
 
-    public async createAccount({ mainProfileName }: FromSchema<typeof createAccountBodySchema>): Promise<Account>{
+    public async createAccount({ mainProfileName }: FromSchema<typeof createAccountSchema.body>): Promise<Account>{
 
         const mainProfileKey = uuidv4();
 

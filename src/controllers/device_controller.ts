@@ -1,6 +1,6 @@
 import { Device } from '../models';
 import { FromSchema } from "json-schema-to-ts";
-import { createDeviceBodySchema } from "../schemas/device_schemas";
+import { createDeviceSchema } from "../schemas/device_schemas";
 import { NotFoundDevice } from "../errors/custom_errors";
 import { QueryRunner } from "typeorm";
 
@@ -26,7 +26,7 @@ export default class DeviceController {
         return device;
     }
 
-    public async createDevice({ deviceKey }: FromSchema<typeof createDeviceBodySchema>): Promise<Device>{
+    public async createDevice({ deviceKey }: FromSchema<typeof createDeviceSchema.body>): Promise<Device>{
 
         const newDevice = new Device();
         newDevice.deviceKey = deviceKey;

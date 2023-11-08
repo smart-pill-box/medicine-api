@@ -1,10 +1,9 @@
 import { QueryRunner } from "typeorm";
-import { createProfileBodySchema } from "../schemas/profile_schemas";
 import { FromSchema } from "json-schema-to-ts";
 import { Account, Profile, Device, ProfileDevice } from "../models";
 import { v4 as uuidv4 } from "uuid"
 import { NotFoundAccount, NotFoundDevice, NotFoundProfile } from "../errors/custom_errors";
-import { createProfileDeviceBodySchema } from "../schemas/profile_device_schemas";
+import { createProfileDeviceSchema } from "../schemas/profile_device_schemas";
 
 export default class ProfileDeviceController {
     transaction: QueryRunner;
@@ -16,7 +15,7 @@ export default class ProfileDeviceController {
     public async createProfileDevice(accountKey: string, profileKey: string,
     { 
         deviceKey
-    }: FromSchema<typeof createProfileDeviceBodySchema> ) {
+    }: FromSchema<typeof createProfileDeviceSchema.body> ) {
         const device = await this.transaction.manager.findOne(Device, {
             where: {
                 deviceKey: deviceKey
