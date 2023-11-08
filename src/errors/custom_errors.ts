@@ -17,3 +17,13 @@ export class NotFoundProfile extends CustomError {
         super(code, description, statusCode)
     }
 }
+
+export class NotFoundDevice extends CustomError {
+    constructor(deviceKey: string){
+        const code = "ERR00003";
+        const description = `Not found device with key ${deviceKey}`;
+        const statusCode = 404;
+        super(code, description, statusCode)
+    }
+}
+

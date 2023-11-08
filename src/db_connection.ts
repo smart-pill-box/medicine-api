@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { Account, Profile } from "./models";
+import { Account, Device, Profile, ProfileDevice } from "./models";
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -10,5 +10,10 @@ export const AppDataSource = new DataSource({
     database: "my_db",
     synchronize: false,
     logging: true,
-    entities: [Account, Profile],
+    entities: [
+        Account, 
+        Profile,
+        Device,
+        ProfileDevice
+    ],
 });

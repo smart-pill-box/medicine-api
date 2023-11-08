@@ -25,9 +25,23 @@ async function getProfile(accountKey, profileKey){
     return response;
 };
 
+async function getDevice(deviceKey){
+    const response = await request.get(`/device/${deviceKey}`);
+
+    return response;
+};
+
+async function postDevice(body){
+    const response = await request.post("/device").send(body);
+
+    return response
+};
+
 module.exports = {
     postAccount,
     getAccount,
     postProfile,
-    getProfile
+    getProfile,
+    getDevice,
+    postDevice
 }

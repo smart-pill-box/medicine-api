@@ -1,3 +1,5 @@
+const { v4 : uuidv4 } = require("uuid")
+
 function createAccountBody(mainProfileName=null){
     if (!mainProfileName){
         mainProfileName = "test main profile name";
@@ -16,7 +18,18 @@ function createProfileBody(name=null){
     }
 };
 
+function createDeviceBody(deviceKey=null){
+    if(!deviceKey){
+        deviceKey = uuidv4();
+    }
+
+    return {
+        deviceKey: deviceKey
+    }
+};
+
 module.exports = {
     createAccountBody,
-    createProfileBody
+    createProfileBody,
+    createDeviceBody
 }
