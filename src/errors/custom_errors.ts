@@ -8,3 +8,12 @@ export class NotFoundAccount extends CustomError {
         super(code, description, statusCode)
     }
 }
+
+export class NotFoundProfile extends CustomError {
+    constructor(accountKey: string, profileKey: string){
+        const code = "ERR00002";
+        const description = `The account ${accountKey} does not have a profile with key ${profileKey}`;
+        const statusCode = 404;
+        super(code, description, statusCode)
+    }
+}

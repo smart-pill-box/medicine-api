@@ -1,10 +1,9 @@
-import { AppDataSource } from "../db_connection";
 import { Account, Profile } from '../models';
 import { FromSchema } from "json-schema-to-ts";
 import { getAccounParamsSchema, createAccountBodySchema } from "../schemas/account_schemas";
 import { NotFoundAccount } from "../errors/custom_errors";
 import { v4 as uuidv4 } from 'uuid';
-import { EntityManager, QueryRunner } from "typeorm";
+import { QueryRunner } from "typeorm";
 
 export default class AccountController {
     transaction: QueryRunner;
@@ -13,7 +12,7 @@ export default class AccountController {
         this.transaction = transaction;
     }
 
-    public async getAccount({ accountKey }: FromSchema<typeof getAccounParamsSchema>): Promise<Account>{
+    public async getAccount(accountKey: string): Promise<Account>{
 
         const account = await this.transaction.manager.findOne(Account, {
             where: {

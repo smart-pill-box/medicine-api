@@ -15,7 +15,7 @@ export async function accountRoutes(server: FastifyInstance){
         async (req, resp)=>{
             const accountController = new AccountController(req.transaction);
 
-            const account = await accountController.getAccount(req.params);
+            const account = await accountController.getAccount(req.params.accountKey);
             resp.status(200).send(AccountDto.toClientResponse(account));
         })
 

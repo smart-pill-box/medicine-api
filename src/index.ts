@@ -5,6 +5,7 @@ import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts
 import { accountRoutes } from "./routes/account_routes";
 import CustomError from "./errors/custom_error";
 import Ajv from "ajv"
+import { profileRoutes } from "./routes/profile_routes";
 
 interface SchemaCompilers {
   body: Ajv;
@@ -92,6 +93,7 @@ AppDataSource.initialize()
     });
   
     server.register(accountRoutes);
+    server.register(profileRoutes);
 
     server.listen({ port: 8080, host: "0.0.0.0" })
       .then((address) => console.log(`server listening on ${address}`))
