@@ -91,9 +91,19 @@ describe("Profile Routes", async ()=>{
         });
     });
     describe("GET /account/:accountKey/profile/:profileKey/profile_account", async () => {
+        it("Returns 404 if profile from wrong account", async ()=>{
+            const account1 = await createAccount();
+            const account2 = await createAccount();
+
+            const profile = await createProfile(account1.accountKey);
+
+            const response = await getProfileDevices(account2.accountKey, profile.profileKey);
+
+            expect(response.status).toBe(404);
+            expect(response.body.code).toBe("ERR00002");
+        });
         it("Show only the devices the profile have", async ()=>{
-            const device1 = await createDevice();
-            const device2 = await createDevice();
+            const { deviceKey } = await createDevice();
 
             const { accountKey } = await createAccount();
             const { profileKey } = await createProfile(accountKey);
@@ -102,13 +112,13 @@ describe("Profile Routes", async ()=>{
             expect(response.status).toBe(200);
             expect(response.body.data.length).toBe(0);
 
-            await createProfileDevice(accountKey, profileKey, device1.deviceKey);
+            await createProfileDevice(accountKey, profileKey, deviceKey);
 
             response = await getProfileDevices(accountKey, profileKey);
 
             expect(response.status).toBe(200);
             expect(response.body.data.length).toBe(1);
-            expect(response.body.data[0].deviceKey).toBe(device1.deviceKey);
+            expect(response.body.data[0].deviceKey).toBe(deviceKey);
 
         });
     })

@@ -57,15 +57,23 @@ export default class ProfileController {
     }
 
     public async getAllProfileDevices(accounKey: string, profileKey: string){
+        const profile = await this.transaction.manager.findOne(Profile, {
+            where: {
+                profileKey: profileKey,
+                account: {
+                    accountKey: accounKey
+                }
+            }
+        });
+
+        if (!profile){
+            throw new NotFoundProfile(accounKey, profileKey);
+        }
+
         const profileDevices = await this.transaction.manager.find(Device, {
             where: {
                 profileDevice: {
-                    profile: {
-                        profileKey: profileKey,
-                        account: {
-                            accountKey: accounKey
-                        }
-                    }
+                    profile: profile
                 }
             }
         });
