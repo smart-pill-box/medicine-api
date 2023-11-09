@@ -1,5 +1,14 @@
 import { DataSource } from "typeorm";
-import { Account, Device, Profile, ProfileDevice } from "./models";
+import { 
+    Account, 
+    Device, 
+    Profile, 
+    ProfileDevice,
+    PillRoutine,
+    PillRoutineStatus,
+    PillRoutineStatusEvent,
+    PillRoutineType,
+} from "./models";
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -14,6 +23,10 @@ export const AppDataSource = new DataSource({
         Account, 
         Profile,
         Device,
-        ProfileDevice
+        ProfileDevice,
+        PillRoutine,
+        PillRoutineStatus,
+        PillRoutineStatusEvent,
+        PillRoutineType,
     ],
 });

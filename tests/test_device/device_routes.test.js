@@ -26,6 +26,7 @@ describe("Device Routes", async ()=>{
             const body = createDeviceBody(deviceKey);
 
             let response = await postDevice(body);
+            console.log(response);
 
             expect(response.status).toBe(201)
             expect(response.body.deviceKey).toBe(deviceKey);

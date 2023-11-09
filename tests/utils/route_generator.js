@@ -51,6 +51,22 @@ async function getProfileDevices(accountKey, profileKey){
     )
 
     return response
+};
+
+async function postPillRoutine(accountKey, profileKey, body){
+    const response = await request.post(
+        `/account/${accountKey}/profile/${profileKey}/pill_routine`
+    ).send(body);
+
+    return response;
+};
+
+async function getProfilePillRoutines(accountKey, profileKey){
+    const response = await request.get(
+        `/account/${accountKey}/profile/${profileKey}/pill_routines`
+    );
+
+    return response;
 }
 
 module.exports = {
@@ -62,4 +78,6 @@ module.exports = {
     getDevice,
     postDevice,
     postProfileDevice,
+    postPillRoutine,
+    getProfilePillRoutines,
 }

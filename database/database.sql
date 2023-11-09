@@ -22,6 +22,10 @@ CREATE TABLE pill_routine_type(
     UNIQUE(enumerator)
 );
 
+INSERT INTO pill_routine_type (enumerator) VALUES 
+('weekdays'),
+('dayPeriod');
+
 CREATE TABLE pill_routine_status (
     id                          SERIAL PRIMARY KEY,
     enumerator                  VARCHAR(50) NOT NULL,
@@ -29,13 +33,20 @@ CREATE TABLE pill_routine_status (
     UNIQUE(enumerator)
 );
 
+INSERT INTO pill_routine_status (enumerator) VALUES 
+('active'),
+('canceled');
+
+
 CREATE TABLE pill_routine (
     id                          SERIAL PRIMARY KEY,
     profile_id                  INTEGER NOT NULL REFERENCES profile(id),
     pill_routine_type_id        INTEGER NOT NULL REFERENCES pill_routine_type(id),
     status_id                   INTEGER NOT NULL REFERENCES pill_routine_status(id),
+    pill_routine_key            CHAR(36) NOT NULL,
+    start_date                  DATE NOT NULL,
     expiration_date             DATE,
-    routine_data                JSONB NOT NULL,
+    pill_routine_data           JSONB NOT NULL,
     name                        VARCHAR(255) NOT NULL,
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW()),
     UNIQUE(name, profile_id)

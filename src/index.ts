@@ -8,6 +8,7 @@ import Ajv from "ajv"
 import { profileRoutes } from "./routes/profile_routes";
 import { deviceRoutes } from "./routes/device_routes";
 import { profileDeviceRoutes } from "./routes/profile_device_routes";
+import { pillRoutineRoutes } from "./routes/pill_routine_routes";
 
 interface SchemaCompilers {
   body: Ajv;
@@ -78,7 +79,7 @@ AppDataSource.initialize()
       }
     })
 
-    server.addHook("preParsing", async (req, resp)=>{
+    server.addHook("onRequest", async (req, resp)=>{
       const queryRunner = AppDataSource.createQueryRunner();
       await queryRunner.connect();
       await queryRunner.startTransaction();
@@ -98,6 +99,7 @@ AppDataSource.initialize()
     server.register(profileRoutes);
     server.register(deviceRoutes);
     server.register(profileDeviceRoutes);
+    server.register(pillRoutineRoutes);
 
     server.listen({ port: 8080, host: "0.0.0.0" })
       .then((address) => console.log(`server listening on ${address}`))

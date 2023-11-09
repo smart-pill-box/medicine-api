@@ -1,4 +1,5 @@
 import CustomError from "./custom_error";
+import { ErrorObject } from "ajv";
 
 export class NotFoundAccount extends CustomError {
     constructor(accountKey: string){
@@ -26,4 +27,41 @@ export class NotFoundDevice extends CustomError {
         super(code, description, statusCode)
     }
 }
+
+export class NotFoundPillRoutineType extends CustomError {
+    constructor(pillRoutineTypeEnum: string){
+        const code = "ERR00004";
+        const description = `The pill routine type ${pillRoutineTypeEnum} does not exists`;
+        const statusCode = 404;
+        super(code, description, statusCode)
+    }
+}
+
+export class WeekdaysPillRoutineNeedOneDay extends CustomError {
+    constructor(){
+        const code = "ERR00005";
+        const description = "A weekday pill routine type needs at least one weekday";
+        const statusCode = 400;
+        super(code, description, statusCode)
+    }
+}
+
+export class InvalidTime extends CustomError {
+    constructor(time: string){
+        const code = "ERR00006";
+        const description = `The time ${time} is invalid`;
+        const statusCode = 400;
+        super(code, description, statusCode)
+    }
+}
+
+export class SchemaError extends CustomError {
+    constructor(errors: ErrorObject[]){
+        const code = "SCHEMA_ERR";
+        const description = JSON.stringify(errors);
+        const statusCode = 400;
+        super(code, description, statusCode)
+    }
+}
+
 
