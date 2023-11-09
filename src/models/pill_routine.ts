@@ -1,19 +1,30 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany, OneToOne, ManyToMany, ManyToOne } from "typeorm";
-import { PillRoutineStatus, PillRoutineStatusEvent, PillRoutineType } from ".";
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany, OneToOne, ManyToMany, ManyToOne, JoinColumn } from "typeorm";
+import { PillRoutineStatus, PillRoutineStatusEvent, PillRoutineType, Profile } from ".";
 
 @Entity({ name: "pill_routine" })
 export class PillRoutine {
     @PrimaryGeneratedColumn({ type: "integer", name: "id" })
     id: number;
 
-    @ManyToOne((type)=>PillRoutineStatus)
+    @ManyToOne((type)=>PillRoutineStatus, {
+        eager: true
+    })
+    @JoinColumn({ name: "status_id" })
     status: PillRoutineStatus;
 
-    @ManyToOne((type)=>PillRoutineType)
-    type: PillRoutineType;
+    @ManyToOne((type)=>PillRoutineType, {
+        eager: true
+    })
+    @JoinColumn({ name: "pill_routine_type_id" })
+    pillRoutineType: PillRoutineType;
+
+    @ManyToOne((type)=>Profile)
+    @JoinColumn({ name: "profile_id" })
+    profile: Profile;
 
     @OneToMany((type)=>PillRoutineStatusEvent, (statusEvent) => statusEvent.pillRoutine, {
-        cascade: ["insert", "update"]
+        cascade: ["insert", "update"],
+        eager: true
     })
     statusEvents: PillRoutineStatusEvent[];
 

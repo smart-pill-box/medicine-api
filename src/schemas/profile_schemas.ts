@@ -72,5 +72,27 @@ export const getProfileDevicesSchema = {
         ],
         additionalProperties: false
     } as const
-}
+};
 
+export const getProfilePillRoutinesSchema = {
+    params: {
+        type: "object",
+        properties: {
+            accountKey: {
+                type: "string",
+                minLength: 36,
+                maxLength: 36
+            },
+            profileKey: {
+                type: "string",
+                minLength: 36,
+                maxLength: 36
+            }
+        },
+        required: [
+            "accountKey",
+            "profileKey"
+        ],
+        additionalProperties: false
+    } as const
+};

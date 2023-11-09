@@ -19,7 +19,7 @@ export default class PillRoutineController {
             name,
             pillRoutineData
         }: FromSchema<typeof createPillRoutineSchema.body>
-    ){
+    ): Promise<PillRoutine> {
         const profile = await this.transaction.manager.findOne(Profile, {
             where: {
                 profileKey: profileKey,
@@ -65,14 +65,18 @@ export default class PillRoutineController {
         pillRoutine.pillRoutineKey = uuidv4();
         pillRoutine.pillRoutineData = pillRoutineData;
         pillRoutine.name = name;
-        pillRoutine.type = pillRoutineTypeModel;
+        pillRoutine.pillRoutineType = pillRoutineTypeModel;
         pillRoutine.status = newStatus;
+        pillRoutine.profile = profile;
 
         const pillRoutineStatusEvent = new PillRoutineStatusEvent();
         pillRoutineStatusEvent.status = newStatus;
+        pillRoutineStatusEvent.eventDatetime = new Date();
 
         pillRoutine.statusEvents = [pillRoutineStatusEvent];
 
-        this.transaction.manager.save(pillRoutine);
+        await this.transaction.manager.save(pillRoutine);
+
+        return pillRoutine;
     }
 }

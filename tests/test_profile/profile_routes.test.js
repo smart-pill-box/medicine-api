@@ -1,7 +1,7 @@
 const { describe } = require("node:test");
 const { v4:uuidv4 } = require("uuid");
-const { createAccount, createProfile, createDevice, createProfileDevice } = require("../utils/object_generator");
-const { getProfile, postProfile, getAccount, getProfileDevices } = require("../utils/route_generator");
+const { createAccount, createProfile, createDevice, createProfileDevice, PillRoutineObjectGenerator } = require("../utils/object_generator");
+const { getProfile, postProfile, getAccount, getProfileDevices, getProfilePillRoutines } = require("../utils/route_generator");
 const { createProfileBody } = require("../utils/body_generator");
 
 describe("Profile Routes", async ()=>{
@@ -90,7 +90,7 @@ describe("Profile Routes", async ()=>{
             expect(response.body.profileKey).toBe(profile.profileKey);
         });
     });
-    describe("GET /account/:accountKey/profile/:profileKey/profile_account", async () => {
+    describe("GET /account/:accountKey/profile/:profileKey/profile_devices", async () => {
         it("Returns 404 if profile from wrong account", async ()=>{
             const account1 = await createAccount();
             const account2 = await createAccount();
@@ -120,6 +120,39 @@ describe("Profile Routes", async ()=>{
             expect(response.body.data.length).toBe(1);
             expect(response.body.data[0].deviceKey).toBe(deviceKey);
 
+        });
+    });
+
+    describe("GET /account/:accountKey/profile/:profileKey/pill_routines", async ()=>{
+        it("Returns 404 if profile from wrong account", async ()=>{
+            const account1 = await createAccount();
+            const account2 = await createAccount();
+
+            const profile = await createProfile(account1.accountKey);
+
+            const response = await getProfilePillRoutines(account2.accountKey, profile.profileKey);
+
+            expect(response.status).toBe(404);
+            expect(response.body.code).toBe("ERR00002");
+        });
+
+        it("Returns only the pillRoutines of that profile", async ()=>{
+            const { accountKey } = await createAccount();
+
+            const profile1 = await createProfile(accountKey);
+            const profile2 = await createProfile(accountKey);
+
+            await PillRoutineObjectGenerator.createDayPeriodPillRoutine(accountKey, profile1.profileKey)
+
+            let response = await getProfilePillRoutines(accountKey, profile2.profileKey);
+
+            expect(response.status).toBe(200);
+            expect(response.body.data.length).toBe(0);
+
+            response = await getProfilePillRoutines(accountKey, profile1.profileKey);
+
+            expect(response.status).toBe(200);
+            expect(response.body.data.length).toBe(1);
         });
     })
 

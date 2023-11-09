@@ -67,7 +67,7 @@ async function getProfilePillRoutines(accountKey, profileKey){
     );
 
     return response;
-}
+};
 
 module.exports = {
     postAccount,

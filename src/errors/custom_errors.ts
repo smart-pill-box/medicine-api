@@ -46,15 +46,6 @@ export class WeekdaysPillRoutineNeedOneDay extends CustomError {
     }
 }
 
-export class InvalidTime extends CustomError {
-    constructor(time: string){
-        const code = "ERR00006";
-        const description = `The time ${time} is invalid`;
-        const statusCode = 400;
-        super(code, description, statusCode)
-    }
-}
-
 export class SchemaError extends CustomError {
     constructor(errors: ErrorObject[]){
         const code = "SCHEMA_ERR";

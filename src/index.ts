@@ -56,6 +56,7 @@ server.setValidatorCompiler(req => {
 AppDataSource.initialize()
   .then(() => {
     server.setErrorHandler(async (err, req, resp)=>{
+      console.log("Error Hapend");
       await req.transaction.rollbackTransaction();
 
       if (err instanceof CustomError){
@@ -80,6 +81,7 @@ AppDataSource.initialize()
     })
 
     server.addHook("onRequest", async (req, resp)=>{
+      console.log("Request Hook");
       const queryRunner = AppDataSource.createQueryRunner();
       await queryRunner.connect();
       await queryRunner.startTransaction();
@@ -89,6 +91,8 @@ AppDataSource.initialize()
     });
 
     server.addHook("onSend", async (req, resp) => {
+      console.log("Send hook");
+
       if (resp.statusCode < 300){
         await req.transaction.commitTransaction();
       }

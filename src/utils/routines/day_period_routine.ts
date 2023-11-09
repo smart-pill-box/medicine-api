@@ -3,7 +3,6 @@ import { Routine } from "./routine";
 import Ajv from "ajv";
 
 export class DayPeriodRoutine extends Routine{
-    routineData: object
     routineDataSchema: object;
 
     constructor(routineData: object){

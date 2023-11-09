@@ -1,5 +1,9 @@
 export abstract class Routine {
-    constructor(routineData: object) {}
+    routineData: object;
+    
+    constructor(routineData: object) {
+        this.routineData = routineData;
+    }
     
     abstract routineDataSchema: object;
     abstract validateRoutineData(): void;

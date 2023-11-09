@@ -1,4 +1,4 @@
-import { SchemaError } from "../../errors/custom_errors";
+import { SchemaError, WeekdaysPillRoutineNeedOneDay } from "../../errors/custom_errors";
 import { Routine } from "./routine";
 import Ajv from "ajv";
 
@@ -83,6 +83,10 @@ export class WeekdaysRoutine extends Routine{
                 throw new Error();
             }
             throw new SchemaError(validator.errors)
+        }
+
+        if(Object.keys(this.routineData).length == 0){
+            throw new WeekdaysPillRoutineNeedOneDay();
         }
     }
 }

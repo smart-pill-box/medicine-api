@@ -1,7 +1,7 @@
 import { QueryRunner } from "typeorm";
 import { createProfileSchema } from "../schemas/profile_schemas";
 import { FromSchema } from "json-schema-to-ts";
-import { Account, Device, Profile } from "../models";
+import { Account, Device, PillRoutine, Profile } from "../models";
 import { v4 as uuidv4 } from "uuid"
 import { NotFoundAccount, NotFoundProfile } from "../errors/custom_errors";
 
@@ -79,5 +79,28 @@ export default class ProfileController {
         });
 
         return profileDevices;
+    }
+
+    public async getAllProfilePillRoutines(accounKey: string, profileKey: string): Promise<PillRoutine[]>{
+        const profile = await this.transaction.manager.findOne(Profile, {
+            where: {
+                profileKey: profileKey,
+                account: {
+                    accountKey: accounKey
+                }
+            }
+        });
+
+        if (!profile){
+            throw new NotFoundProfile(accounKey, profileKey);
+        }
+
+        const profilePillRoutines = await this.transaction.manager.find(PillRoutine, {
+            where: {
+                profile: profile
+            }
+        })
+
+        return profilePillRoutines;
     }
 }

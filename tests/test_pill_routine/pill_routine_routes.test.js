@@ -62,6 +62,7 @@ describe("Pill Routine Routes", async ()=>{
                 body.pillRoutineData.other = "other";
                 const response = await postPillRoutine(accountKey, profileKey, body);
     
+                console.log(response.body);
                 expect(response.status).toBe(400);
                 expect(response.body.code).toBe("SCHEMA_ERR");
             });
@@ -79,18 +80,6 @@ describe("Pill Routine Routes", async ()=>{
                 expect(response.body.code).toBe("SCHEMA_ERR");
             });
 
-            it("Return 400 if routine_data doesn't have any day", async ()=>{
-                const { accountKey } = await createAccount();
-                const { profileKey } = await createProfile(accountKey);
-                
-                let body = PillRoutineBodyGenerator.createWeekdaysPillRoutineBody({});
-                const response = await postPillRoutine(accountKey, profileKey, body);
-    
-                console.log(response.body)
-                expect(response.status).toBe(400);
-                expect(response.body.code).toBe("ERR00005");
-            });
-        
             it("Return 400 if some hour is invalid", async ()=>{
                 const { accountKey } = await createAccount();
                 const { profileKey } = await createProfile(accountKey);
@@ -102,7 +91,7 @@ describe("Pill Routine Routes", async ()=>{
                 let response = await postPillRoutine(accountKey, profileKey, body);
 
                 expect(response.status).toBe(400);
-                expect(response.body.code).toBe("ERR00005");
+                expect(response.body.code).toBe("SCHEMA_ERR");
 
                 body = PillRoutineBodyGenerator.createWeekdaysPillRoutineBody({
                     monday: ["12:00", "13:00"],
@@ -110,6 +99,18 @@ describe("Pill Routine Routes", async ()=>{
                 });
                 response = await postPillRoutine(accountKey, profileKey, body);
     
+                expect(response.status).toBe(400);
+                expect(response.body.code).toBe("SCHEMA_ERR");
+            });
+
+            it("Return 400 if routine_data doesn't have any day", async ()=>{
+                const { accountKey } = await createAccount();
+                const { profileKey } = await createProfile(accountKey);
+                
+                let body = PillRoutineBodyGenerator.createWeekdaysPillRoutineBody({});
+                const response = await postPillRoutine(accountKey, profileKey, body);
+    
+                console.log(response.body)
                 expect(response.status).toBe(400);
                 expect(response.body.code).toBe("ERR00005");
             });
@@ -123,6 +124,7 @@ describe("Pill Routine Routes", async ()=>{
                     tuesday: ["11:00", "20:35"]
                 });
                 let response = await postPillRoutine(accountKey, profileKey, body);
+                console.log(response.body);
     
                 expect(response.status).toBe(201);
 
@@ -133,6 +135,28 @@ describe("Pill Routine Routes", async ()=>{
                 expect(response.status).toBe(200);
                 expect(response.body.data.length).toBe(1);
                 expect(response.body.data[0].pillRoutineKey).toBe(pillRoutineKey)
+            });
+
+            it("Create status event and save to DB", async ()=>{
+                const { accountKey } = await createAccount();
+                const { profileKey } = await createProfile(accountKey);
+                
+                let body = PillRoutineBodyGenerator.createWeekdaysPillRoutineBody({
+                    monday: ["12:00", "13:00"],
+                    tuesday: ["11:00", "20:35"]
+                });
+                let response = await postPillRoutine(accountKey, profileKey, body);
+                console.log(response.body);
+    
+                expect(response.status).toBe(201);
+
+                response = await getProfilePillRoutines(accountKey, profileKey);
+
+                expect(response.status).toBe(200);
+                expect(response.body.data.length).toBe(1);
+                expect(response.body.data[0].status).toBe("active")
+                expect(response.body.data[0].statusEvents.length).toBe(1)
+                expect(response.body.data[0].statusEvents[0].status).toBe("active")
             });
         });
 
@@ -207,7 +231,7 @@ describe("Pill Routine Routes", async ()=>{
                 let response = await postPillRoutine(accountKey, profileKey, body);
 
                 expect(response.status).toBe(400);
-                expect(response.body.code).toBe("ERR00006");
+                expect(response.body.code).toBe("SCHEMA_ERR");
 
                 body = PillRoutineBodyGenerator.createDayPeriodPillRoutineBody(pillsTimes=[
                     "12:00", "11:00", "21:60"
@@ -215,7 +239,7 @@ describe("Pill Routine Routes", async ()=>{
                 response = await postPillRoutine(accountKey, profileKey, body);
     
                 expect(response.status).toBe(400);
-                expect(response.body.code).toBe("ERR00006");
+                expect(response.body.code).toBe("SCHEMA_ERR");
             });
 
             it("Creates sucessfuly when body is right", async ()=>{
@@ -237,6 +261,26 @@ describe("Pill Routine Routes", async ()=>{
                 expect(response.status).toBe(200)
                 expect(response.body.data.length).toBe(1)
                 expect(response.body.data[0].pillRoutineKey).toBe(pillRoutineKey);
+            });
+            it("Create status event and save to DB", async ()=>{
+                const { accountKey } = await createAccount();
+                const { profileKey } = await createProfile(accountKey);
+                
+                let body = PillRoutineBodyGenerator.createDayPeriodPillRoutineBody(
+                    periodInDays = 1,
+                    pillsTimes = ["12:00", "11:00", "22:00"], 
+                );
+                let response = await postPillRoutine(accountKey, profileKey, body);
+
+                expect(response.status).toBe(201);
+                
+                response = await getProfilePillRoutines(accountKey, profileKey);
+
+                expect(response.status).toBe(200);
+                expect(response.body.data.length).toBe(1);
+                expect(response.body.data[0].status).toBe("active")
+                expect(response.body.data[0].statusEvents.length).toBe(1)
+                expect(response.body.data[0].statusEvents[0].status).toBe("active")
             });
         })
     })
