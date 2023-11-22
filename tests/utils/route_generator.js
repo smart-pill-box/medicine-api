@@ -1,8 +1,16 @@
 let request = require('supertest');
+const { createSignedToken, createJwkExpectation } = require('./keycloak_mock');
+const { v4: uuidv4 } = require("uuid");
+const { clearMock } = require('./mock');
 request = request("http://localhost:8080");
 
-async function postAccount(body){
-    const response = await request.post('/account').send(body);
+async function postAccount(body, authorization=null){
+    await createJwkExpectation()
+    if (!authorization){
+        authorization = createSignedToken(uuidv4())
+    }
+
+    const response = await request.post('/account').set("authorization", authorization).send(body);
 
     return response;
 };

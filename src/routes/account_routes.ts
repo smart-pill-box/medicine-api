@@ -17,14 +17,15 @@ export async function accountRoutes(server: FastifyInstance){
             resp.status(200).send(AccountDto.toClientResponse(account));
         })
 
-    server.post<{ Body: FromSchema<typeof createAccountSchema.body> }>(
+    server.post<{ Body: FromSchema<typeof createAccountSchema.body>, Headers: FromSchema<typeof createAccountSchema.headers>}>(
         "/account",
         {
             schema: createAccountSchema
         },
         async (req, resp)=>{
             const accountController = new AccountController(req.transaction);
-            const newAccount = await accountController.createAccount(req.body);
+        
+            const newAccount = await accountController.createAccount(req.body, req.headers.authorization);
 
             resp.status(201).send(AccountDto.toClientResponse(newAccount));
     }); 

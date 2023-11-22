@@ -4,6 +4,7 @@ import { createAccountSchema } from "../schemas/account_schemas";
 import { NotFoundAccount } from "../errors/custom_errors";
 import { v4 as uuidv4 } from 'uuid';
 import { QueryRunner } from "typeorm";
+import validateToken from '../utils/authorization_validator';
 
 export default class AccountController {
     transaction: QueryRunner;
@@ -30,12 +31,14 @@ export default class AccountController {
         return account;
     }
 
-    public async createAccount({ mainProfileName }: FromSchema<typeof createAccountSchema.body>): Promise<Account>{
+    public async createAccount({ mainProfileName }: FromSchema<typeof createAccountSchema.body>, authorization: string): Promise<Account>{
+        const token = await validateToken(authorization);
 
+        const accountKey = token.sub!;
         const mainProfileKey = uuidv4();
 
         const newAccount = new Account();
-        newAccount.accountKey = uuidv4();
+        newAccount.accountKey = accountKey;
         newAccount.mainProfileKey = mainProfileKey;
 
         const mainProfile = new Profile();

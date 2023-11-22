@@ -12,6 +12,17 @@ export const createAccountSchema = {
             "mainProfileName"
         ],
         additionalProperties: false
+    } as const,
+    headers: {
+        type: "object",
+        properties: {
+            authorization: {
+                type: "string"
+            }
+        },
+        required: [
+            "authorization"
+        ]
     } as const
 }
 
