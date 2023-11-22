@@ -2,9 +2,10 @@ import { QueryRunner } from "typeorm";
 import { FromSchema } from "json-schema-to-ts";
 import { createPillRoutineSchema } from "../schemas/pill_routine_schemas";
 import { PillRoutine, PillRoutineStatus, PillRoutineStatusEvent, PillRoutineType, Profile } from "../models";
-import { NotFoundPillRoutineType, NotFoundProfile } from "../errors/custom_errors";
+import { NotFoundPillRoutineType, NotFoundProfile, UnauthorizedError } from "../errors/custom_errors";
 import { v4 as uuidv4 } from "uuid"
 import RoutineFactory from "../utils/routine_factory";
+import validateToken from "../utils/authorization_validator";
 
 export default class PillRoutineController {
     transaction: QueryRunner;
@@ -18,8 +19,14 @@ export default class PillRoutineController {
             pillRoutineType,
             name,
             pillRoutineData
-        }: FromSchema<typeof createPillRoutineSchema.body>
+        }: FromSchema<typeof createPillRoutineSchema.body>,
+        authorization: string
     ): Promise<PillRoutine> {
+        const token = await validateToken(authorization);
+        if (token.sub! != accountKey){
+            throw new UnauthorizedError()
+        }
+
         const profile = await this.transaction.manager.findOne(Profile, {
             where: {
                 profileKey: profileKey,

@@ -1,7 +1,7 @@
 import { Account, Profile } from '../models';
 import { FromSchema } from "json-schema-to-ts";
 import { createAccountSchema } from "../schemas/account_schemas";
-import { NotFoundAccount } from "../errors/custom_errors";
+import { NotFoundAccount, UnauthorizedError } from "../errors/custom_errors";
 import { v4 as uuidv4 } from 'uuid';
 import { QueryRunner } from "typeorm";
 import validateToken from '../utils/authorization_validator';
@@ -13,7 +13,11 @@ export default class AccountController {
         this.transaction = transaction;
     }
 
-    public async getAccount(accountKey: string): Promise<Account>{
+    public async getAccount(accountKey: string, authorization: string): Promise<Account>{
+        const token = await validateToken(authorization);
+        if (token.sub! != accountKey){
+            throw new UnauthorizedError()
+        }
 
         const account = await this.transaction.manager.findOne(Account, {
             where: {

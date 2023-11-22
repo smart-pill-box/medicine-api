@@ -15,20 +15,35 @@ async function postAccount(body, authorization=null){
     return response;
 };
 
-async function getAccount(accountKey){
-    const response = await request.get(`/account/${accountKey}`);
+async function getAccount(accountKey, authorization=null){
+    await createJwkExpectation()
+    if (!authorization){
+        authorization = createSignedToken(accountKey)
+    }
+
+    const response = await request.get(`/account/${accountKey}`).set("authorization", authorization);
 
     return response;
 };
 
-async function postProfile(accountKey, body){
-    const response = await request.post(`/account/${accountKey}/profile`).send(body);
+async function postProfile(accountKey, body, authorization=null){
+    await createJwkExpectation()
+    if (!authorization){
+        authorization = createSignedToken(accountKey)
+    }
+
+    const response = await request.post(`/account/${accountKey}/profile`).set("authorization", authorization).send(body);
 
     return response;
 };
 
-async function getProfile(accountKey, profileKey){
-    const response = await request.get(`/account/${accountKey}/profile/${profileKey}`);
+async function getProfile(accountKey, profileKey, authorization=null){
+    await createJwkExpectation()
+    if (!authorization){
+        authorization = createSignedToken(accountKey)
+    }
+
+    const response = await request.get(`/account/${accountKey}/profile/${profileKey}`).set("authorization", authorization);
 
     return response;
 };
@@ -53,26 +68,41 @@ async function postProfileDevice(accountKey, profileKey, body){
     return response;
 };
 
-async function getProfileDevices(accountKey, profileKey){
+async function getProfileDevices(accountKey, profileKey, authorization=null){
+    await createJwkExpectation()
+    if (!authorization){
+        authorization = createSignedToken(accountKey)
+    }
+
     const response = await request.get(
         `/account/${accountKey}/profile/${profileKey}/profile_devices`
-    )
+    ).set("authorization", authorization)
 
     return response
 };
 
-async function postPillRoutine(accountKey, profileKey, body){
+async function postPillRoutine(accountKey, profileKey, body, authorization=null){
+    await createJwkExpectation()
+    if (!authorization){
+        authorization = createSignedToken(accountKey)
+    }
+
     const response = await request.post(
         `/account/${accountKey}/profile/${profileKey}/pill_routine`
-    ).send(body);
+    ).set("authorization", authorization).send(body);
 
     return response;
 };
 
-async function getProfilePillRoutines(accountKey, profileKey){
+async function getProfilePillRoutines(accountKey, profileKey, authorization=null){
+    await createJwkExpectation()
+    if (!authorization){
+        authorization = createSignedToken(accountKey)
+    }
+
     const response = await request.get(
         `/account/${accountKey}/profile/${profileKey}/pill_routines`
-    );
+    ).set("authorization", authorization);
 
     return response;
 };

@@ -1,6 +1,7 @@
 import axios from "axios";
 import jwt from "jsonwebtoken"
 import jwksRsa, { JwksClient } from "jwks-rsa"
+import { ExpiredTokenError, MalformatedToken, TokenNotBeforeNBF } from "../errors/custom_errors";
 
 const jwksUri = `${process.env.KC_ENDPOINT}/realms/${process.env.KC_REALM}/protocol/openid-connect/certs`;
 
@@ -14,7 +15,7 @@ export default async function validateToken(tokenStr: string): Promise<jwt.JwtPa
         
         const token = jwt.decode(tokenStr, { json: true, complete: true });
         if (!token){
-            throw new Error("Invalid Token")
+            throw new MalformatedToken()
         }
 
         const pubKey = await client.getSigningKey(token?.header.kid);
@@ -23,7 +24,17 @@ export default async function validateToken(tokenStr: string): Promise<jwt.JwtPa
 
         return verified as jwt.JwtPayload;
     
-    } catch(err){
+    } catch(err: any){
+        if (err.name == "JsonWebTokenError"){
+            throw new MalformatedToken();
+        } 
+        else if (err.name == "TokenExpiredError"){
+            throw new ExpiredTokenError();
+        } 
+        else if(err.name == "NotBeforeError"){
+            throw new TokenNotBeforeNBF();
+        }
+    
         throw(err)
     }
 

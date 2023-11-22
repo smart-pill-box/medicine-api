@@ -55,4 +55,38 @@ export class SchemaError extends CustomError {
     }
 }
 
+export class UnauthorizedError extends CustomError {
+    constructor(){
+        const code = "UNAUTHORIZED";
+        const description = "You are not authorized to access that endpoint"
+        const statusCode = 401;
+        super(code, description, statusCode)
+    }
+}
 
+export class MalformatedToken extends CustomError {
+    constructor(){
+        const code = "JWT_ERROR";
+        const description = "Your JWT Token is malformated"
+        const statusCode = 401;
+        super(code, description, statusCode)
+    }
+}
+
+export class ExpiredTokenError extends CustomError {
+    constructor(){
+        const code = "EXPIRED_ERR";
+        const description = "Your token is expired"
+        const statusCode = 401;
+        super(code, description, statusCode)
+    }
+}
+
+export class TokenNotBeforeNBF extends CustomError {
+    constructor(){
+        const code = "NBF_ERR";
+        const description = "Your token is not active yet"
+        const statusCode = 401;
+        super(code, description, statusCode)
+    }
+}

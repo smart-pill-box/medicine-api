@@ -27,13 +27,18 @@ async function createJwkExpectation(){
     })
 }
 
-function createSignedToken(accountKey){
+function createSignedToken(accountKey, {
+    expiresIn=undefined,
+    notBefore=undefined
+}={}){
     const signed = jwt.sign({
         sub: accountKey
     }, privKey, {
         header: {
             kid: kid
         },
+        ...(expiresIn && {expiresIn: expiresIn}),
+        ...(notBefore && {notBefore: notBefore}),
         algorithm: "RS256"
     });
 

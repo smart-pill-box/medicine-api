@@ -25,6 +25,18 @@ export const createProfileSchema = {
             "name"
         ],
         additionalProperties: false
+    } as const,
+
+    headers: {
+        type: "object",
+        properties: {
+            authorization: {
+                type: "string"
+            }
+        },
+        required: [
+            "authorization"
+        ]
     } as const
 }
 
@@ -48,6 +60,18 @@ export const getProfileSchema = {
             "profileKey"
         ],
         additionalProperties: false
+    } as const,
+
+    headers: {
+        type: "object",
+        properties: {
+            authorization: {
+                type: "string"
+            }
+        },
+        required: [
+            "authorization"
+        ]
     } as const
 }
 
@@ -71,6 +95,18 @@ export const getProfileDevicesSchema = {
             "profileKey"
         ],
         additionalProperties: false
+    } as const,
+
+    headers: {
+        type: "object",
+        properties: {
+            authorization: {
+                type: "string"
+            }
+        },
+        required: [
+            "authorization"
+        ]
     } as const
 };
 
@@ -94,5 +130,17 @@ export const getProfilePillRoutinesSchema = {
             "profileKey"
         ],
         additionalProperties: false
+    } as const,
+    
+    headers: {
+        type: "object",
+        properties: {
+            authorization: {
+                type: "string"
+            }
+        },
+        required: [
+            "authorization"
+        ]
     } as const
 };

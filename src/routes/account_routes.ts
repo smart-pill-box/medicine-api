@@ -5,7 +5,7 @@ import { getAccountSchema, createAccountSchema } from '../schemas/account_schema
 import AccountController from '../controllers/account_controller';
 
 export async function accountRoutes(server: FastifyInstance){
-    server.get<{ Params: FromSchema<typeof getAccountSchema.params> }>(
+    server.get<{ Params: FromSchema<typeof getAccountSchema.params>, Headers: FromSchema<typeof getAccountSchema.headers> }>(
         "/account/:accountKey",
         {
             schema: getAccountSchema
@@ -13,7 +13,7 @@ export async function accountRoutes(server: FastifyInstance){
         async (req, resp)=>{
             const accountController = new AccountController(req.transaction);
 
-            const account = await accountController.getAccount(req.params.accountKey);
+            const account = await accountController.getAccount(req.params.accountKey, req.headers.authorization);
             resp.status(200).send(AccountDto.toClientResponse(account));
         })
 

@@ -2,9 +2,55 @@ const { describe } = require("node:test");
 const { postPillRoutine, getProfilePillRoutines } = require("../utils/route_generator");
 const { createAccount, createProfile } = require("../utils/object_generator");
 const { PillRoutineBodyGenerator } = require("../utils/body_generator");
+const { createSignedToken } = require("../utils/keycloak_mock");
 
 describe("Pill Routine Routes", async ()=>{
     describe("POST /account/:accountKey/profile/:profileKey/pill_routine", async ()=>{
+        it("Return 401 with malformated Token", async ()=>{
+            const {accountKey} = await createAccount();
+            const {profileKey} = await createProfile(accountKey);
+        
+            const body = PillRoutineBodyGenerator.createDayPeriodPillRoutineBody();
+            const response = await postPillRoutine(accountKey, profileKey, body, "lalalala");
+
+            expect(response.status).toBe(401)
+            expect(response.body.code).toBe("JWT_ERROR");
+        });
+        it("Return 401 with expired token", async ()=>{
+            const {accountKey} = await createAccount();
+            const {profileKey} = await createProfile(accountKey);
+        
+            const token = createSignedToken(accountKey, {expiresIn: "-1 days"})
+            const body = PillRoutineBodyGenerator.createDayPeriodPillRoutineBody();
+            const response = await postPillRoutine(accountKey, profileKey, body, token);
+
+            expect(response.status).toBe(401)
+            expect(response.body.code).toBe("EXPIRED_ERR");
+        });
+        it("Return 401 with token before nbf", async ()=>{
+            const {accountKey} = await createAccount();
+            const {profileKey} = await createProfile(accountKey);
+        
+            const token = createSignedToken(accountKey, {notBefore: "1 days"})
+            const body = PillRoutineBodyGenerator.createDayPeriodPillRoutineBody();
+            const response = await postPillRoutine(accountKey, profileKey, body, token);
+
+            expect(response.status).toBe(401)
+            expect(response.body.code).toBe("NBF_ERR");
+        });
+        if("Return 401 unauthorized with token of other account", async ()=>{
+            let account1 = await createAccount();
+            let account2 = await createAccount();
+            const {profileKey} = await createProfile(account1.accountKey);
+
+            const token = createSignedToken(account2.accountKey);
+            const body = PillRoutineBodyGenerator.createDayPeriodPillRoutineBody();
+            const response = postPillRoutine(account1.accountKey, profileKey, body, token);
+
+            expect(response.status).toBe(401)
+            expect(response.body.code).toBe("UNAUTHORIZED")
+        });
+
         it("Return 404 if profile is from other account", async ()=>{
             const account1 = await createAccount();
             const account2 = await createAccount();

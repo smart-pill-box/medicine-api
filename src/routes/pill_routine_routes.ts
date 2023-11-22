@@ -7,7 +7,8 @@ import { PillRoutineDto } from '../dtos/pill_routine_dto';
 export async function pillRoutineRoutes(server: FastifyInstance){
     server.post<{ 
         Params: FromSchema<typeof createPillRoutineSchema.params>,
-        Body: FromSchema<typeof createPillRoutineSchema.body>
+        Body: FromSchema<typeof createPillRoutineSchema.body>,
+        Headers: FromSchema<typeof createPillRoutineSchema.headers>,
     }>(
         "/account/:accountKey/profile/:profileKey/pill_routine",
         {
@@ -17,7 +18,7 @@ export async function pillRoutineRoutes(server: FastifyInstance){
             const pillRoutineController = new PillRoutineController(req.transaction);
 
             const { accountKey, profileKey } = req.params;
-            const pillRoutine = await pillRoutineController.createPillRoutine(accountKey, profileKey, req.body);
+            const pillRoutine = await pillRoutineController.createPillRoutine(accountKey, profileKey, req.body, req.headers.authorization);
 
             resp.status(201).send(PillRoutineDto.toClientResponse(pillRoutine))
         })

@@ -4,15 +4,48 @@ const { v4: uuidv4 } = require("uuid");
 const { postAccount, getAccount } = require("../utils/route_generator");
 const { createAccountBody } = require("../utils/body_generator");
 const { createAccount } = require("../utils/object_generator");
+const { createSignedToken } = require('../utils/keycloak_mock');
 
 describe("Account routes", async ()=>{
     describe('POST /account', async () => {
+        it("Return 401 with malformated Token", async ()=>{
+            const body = createAccountBody();
+            const response = await postAccount(body, "lalala");
+
+            expect(response.status).toBe(401)
+            expect(response.body.code).toBe("JWT_ERROR");
+        });
+        it("Return 401 with expired token", async ()=>{
+            const body = createAccountBody();
+            const token = createSignedToken(uuidv4(), {expiresIn: "-1 days"})
+            const response = await postAccount(body, token);
+
+            expect(response.status).toBe(401)
+            expect(response.body.code).toBe("EXPIRED_ERR");
+        });
+        it("Return 401 with token before nbf", async ()=>{
+            const body = createAccountBody();
+            const token = createSignedToken(uuidv4(), {notBefore: "1 days"})
+            const response = await postAccount(body, token);
+
+            expect(response.status).toBe(401)
+            expect(response.body.code).toBe("NBF_ERR");
+        });
         it("Return 201 on creation and return some json", async ()=>{
             const body = createAccountBody();
             const response = await postAccount(body);
         
             expect(response.status).toBe(201);
             expect(response.body).toBeDefined();
+        });
+        it("Create with accountKey equal token sub", async ()=>{
+            const body = createAccountBody();
+            const sub = uuidv4();
+            const token = createSignedToken(sub);
+            const response = await postAccount(body, token);
+        
+            expect(response.status).toBe(201);
+            expect(response.body.accountKey).toBe(sub);
         });
         it("Create account and profile in DB", async () => {
             const account = await createAccount();
@@ -59,6 +92,16 @@ describe("Account routes", async ()=>{
             expect(response.status).toBe(404);
             expect(response.body.code).toBe("ERR00001")
         });
+        if("Return 401 unauthorized with toke of other account", async ()=>{
+            let account1 = await createAccount();
+            let account2 = await createAccount();
+
+            const token = createSignedToken(account1.accountKey);
+            const response = getAccount(account2.accountKey, token);
+
+            expect(response.status).toBe(401)
+            expect(response.body.code).toBe("UNAUTHORIZED")
+        })
         it("Returns 200 with the object if it exists", async () => {
             let account = await createAccount();
             

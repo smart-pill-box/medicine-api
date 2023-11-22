@@ -7,7 +7,10 @@ import { DeviceDto } from '../dtos/device_dto';
 import { PillRoutineDto } from '../dtos/pill_routine_dto';
 
 export async function profileRoutes(server: FastifyInstance){
-    server.get<{ Params: FromSchema<typeof getProfileSchema.params> }>(
+    server.get<{ 
+        Params: FromSchema<typeof getProfileSchema.params>, 
+        Headers: FromSchema<typeof getProfileSchema.headers>
+    }>(
         "/account/:accountKey/profile/:profileKey",
         {
             schema: getProfileSchema
@@ -15,14 +18,18 @@ export async function profileRoutes(server: FastifyInstance){
         async (req, resp)=>{
             const profileController = new ProfileController(req.transaction)
 
-            const profile = await profileController.getProfile(req.params.accountKey, req.params.profileKey);
+            const profile = await profileController.getProfile(
+                req.params.accountKey, req.params.profileKey, req.headers.authorization);
 
             resp.status(200).send(
                 ProfileDto.toClientResponse(profile)
             );
         })
 
-    server.get<{ Params: FromSchema<typeof getProfileDevicesSchema.params> }>(
+    server.get<{ 
+        Params: FromSchema<typeof getProfileDevicesSchema.params>, 
+        Headers: FromSchema<typeof getProfileDevicesSchema.headers>
+    }>(
         "/account/:accountKey/profile/:profileKey/profile_devices",
         {
             schema: getProfileDevicesSchema
@@ -31,7 +38,7 @@ export async function profileRoutes(server: FastifyInstance){
             const profileController = new ProfileController(req.transaction);
 
             const profileDevices = await profileController.getAllProfileDevices(
-                req.params.accountKey, req.params.profileKey
+                req.params.accountKey, req.params.profileKey, req.headers.authorization
             );
 
             resp.status(200).send(
@@ -45,7 +52,10 @@ export async function profileRoutes(server: FastifyInstance){
         }
     )
 
-    server.get<{ Params: FromSchema<typeof getProfilePillRoutinesSchema.params> }>(
+    server.get<{ 
+        Params: FromSchema<typeof getProfilePillRoutinesSchema.params>, 
+        Headers: FromSchema<typeof getProfilePillRoutinesSchema.headers>
+    }>(
         "/account/:accountKey/profile/:profileKey/pill_routines",
         {
             schema: getProfilePillRoutinesSchema
@@ -54,7 +64,7 @@ export async function profileRoutes(server: FastifyInstance){
             const profileController = new ProfileController(req.transaction);
 
             const profilePillRoutines = await profileController.getAllProfilePillRoutines(
-                req.params.accountKey, req.params.profileKey
+                req.params.accountKey, req.params.profileKey, req.headers.authorization
             );
 
             resp.status(200).send(
@@ -71,7 +81,8 @@ export async function profileRoutes(server: FastifyInstance){
 
     server.post<{
         Params: FromSchema<typeof createProfileSchema.params>,
-        Body: FromSchema<typeof createProfileSchema.body>
+        Body: FromSchema<typeof createProfileSchema.body>,
+        Headers: FromSchema<typeof createProfileSchema.headers>
     }>(
         "/account/:accountKey/profile",
         {
@@ -80,7 +91,9 @@ export async function profileRoutes(server: FastifyInstance){
         async (req, resp)=>{
             const profileController = new ProfileController(req.transaction)
 
-            const profile = await profileController.createProfile(req.params.accountKey, req.body);
+            const profile = await profileController.createProfile(
+                req.params.accountKey, req.body, req.headers.authorization
+            );
 
             resp.status(201).send(
                 ProfileDto.toClientResponse(profile)

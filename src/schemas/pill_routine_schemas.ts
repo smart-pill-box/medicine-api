@@ -40,5 +40,17 @@ export const createPillRoutineSchema = {
             "name"
         ],
         additionalProperties: false
+    } as const,
+
+    headers: {
+        type: "object",
+        properties: {
+            authorization: {
+                type: "string"
+            }
+        },
+        required: [
+            "authorization"
+        ]
     } as const
 }

@@ -3,9 +3,51 @@ const { v4:uuidv4 } = require("uuid");
 const { createAccount, createProfile, createDevice, createProfileDevice, PillRoutineObjectGenerator } = require("../utils/object_generator");
 const { getProfile, postProfile, getAccount, getProfileDevices, getProfilePillRoutines } = require("../utils/route_generator");
 const { createProfileBody } = require("../utils/body_generator");
+const { createSignedToken } = require("../utils/keycloak_mock");
 
 describe("Profile Routes", async ()=>{
     describe("POST /account/:accountKey/profile", async ()=>{
+        it("Return 401 with malformated Token", async ()=>{
+            const {accountKey} = await createAccount();
+        
+            const body = createProfileBody();
+            const response = await postProfile(accountKey, body, "lalala");
+
+            expect(response.status).toBe(401)
+            expect(response.body.code).toBe("JWT_ERROR");
+        });
+        it("Return 401 with expired token", async ()=>{
+            const {accountKey} = await createAccount();
+        
+            const token = createSignedToken(accountKey, {expiresIn: "-1 days"})
+            const body = createProfileBody();
+            const response = await postProfile(accountKey, body, token);
+
+            expect(response.status).toBe(401)
+            expect(response.body.code).toBe("EXPIRED_ERR");
+        });
+        it("Return 401 with token before nbf", async ()=>{
+            const {accountKey} = await createAccount();
+        
+            const token = createSignedToken(accountKey, {notBefore: "1 days"})
+            const body = createProfileBody();
+            const response = await postProfile(accountKey, body, token);
+
+            expect(response.status).toBe(401)
+            expect(response.body.code).toBe("NBF_ERR");
+        });
+        if("Return 401 unauthorized with token of other account", async ()=>{
+            let account1 = await createAccount();
+            let account2 = await createAccount();
+
+            const token = createSignedToken(account2.accountKey);
+            const body = createProfileBody();
+            const response = await postProfile(account1.accountKey, body, token);
+
+            expect(response.status).toBe(401)
+            expect(response.body.code).toBe("UNAUTHORIZED")
+        });
+
         it("Return 404 if account does not exists", async ()=>{
             await createAccount();
 
