@@ -1,5 +1,5 @@
-const { createAccountBody, createProfileBody, createDeviceBody, createProfileDeviceBody, PillRoutineBodyGenerator } =  require("./body_generator");
-const { postAccount, postProfile, postDevice, postProfileDevice, postPillRoutine } =  require("./route_generator");
+const { createAccountBody, createProfileBody, createDeviceBody, createProfileDeviceBody, PillRoutineBodyGenerator, createModifiedPillBody } =  require("./body_generator");
+const { postAccount, postProfile, postDevice, postProfileDevice, postPillRoutine, postModifiedPill } =  require("./route_generator");
 
 
 async function createAccount(mainProfileName=null){
@@ -71,8 +71,22 @@ class PillRoutineObjectGenerator{
         );
         const response = await postPillRoutine(accounKey, profileKey, body);
 
-        return response;
+        expect(response.status).toBe(201);
+
+        return response.body;
     }
+}
+
+async function createModifiedPill(accountKey, profileKey, pillRoutineKey, status, pillDatetime){
+    const body = createModifiedPillBody(status, pillDatetime);
+
+    const response = await postModifiedPill(accountKey, profileKey, pillRoutineKey, body);
+
+    console.log(response.body);
+    console.log(pillRoutineKey);
+    expect(response.status).toBe(201);
+
+    return response.body;
 }
 
 module.exports = {
@@ -80,5 +94,6 @@ module.exports = {
     createProfile,
     createDevice,
     createProfileDevice,
-    PillRoutineObjectGenerator
+    PillRoutineObjectGenerator,
+    createModifiedPill,
 }

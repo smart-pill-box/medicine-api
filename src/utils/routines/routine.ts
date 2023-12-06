@@ -1,11 +1,8 @@
+import { PillRoutine } from "../../models";
+
 export abstract class Routine {
-    routineData: object;
-    
-    constructor(routineData: object) {
-        this.routineData = routineData;
-    }
-    
+
     abstract routineDataSchema: object;
-    abstract validateRoutineData(): void;
-    
+    abstract validateRoutineData(routineData: any): void;
+    abstract getQuantityOfPillsByDatetime(pillDatetime: Date, pillRoutine: PillRoutine): number;
 }

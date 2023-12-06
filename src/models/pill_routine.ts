@@ -38,7 +38,7 @@ export class PillRoutine {
     expirationDate: string;
 
     @Column({ type: "jsonb", name: "pill_routine_data" })
-    pillRoutineData: object;
+    pillRoutineData: {[key: string]: any};
 
     @Column({type: "varchar", length: "255", name: "name"})
     name: string;

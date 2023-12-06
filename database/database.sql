@@ -74,25 +74,32 @@ CREATE TABLE pill_routine_update (
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
 );
 
-CREATE TABLE pill_status (
+CREATE TABLE modified_pill_status (
     id                          SERIAL PRIMARY KEY,
     enumerator                  VARCHAR(50) NOT NULL,
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
 );
 
-CREATE TABLE pill (
+INSERT INTO modified_pill_status (enumerator) VALUES
+('loaded'),
+('canceled'),
+('manualyConfirmed'),
+('pillBoxConfirmed');
+
+CREATE TABLE modified_pill (
     id                          SERIAL PRIMARY KEY,
     pill_routine_id             INTEGER NOT NULL REFERENCES pill_routine(id),
-    status_id                   INTEGER NOT NULL REFERENCES pill_status(id),
+    status_id                   INTEGER NOT NULL REFERENCES modified_pill_status(id),
     pill_datetime               TIMESTAMP NOT NULL,
-    confirmation_interval       INTERVAL DAY TO SECOND,
+    quantity                    INTEGER NOT NULL,
+    confirmation_datetime       TIMESTAMP,
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
 );
 
-CREATE TABLE pill_status_event (
+CREATE TABLE modified_pill_status_event (
     id                          SERIAL PRIMARY KEY,
-    pill_id                     INTEGER NOT NULL REFERENCES pill(id),
-    status_id                   INTEGER NOT NULL REFERENCES pill_status(id),
+    modified_pill_id            INTEGER NOT NULL REFERENCES modified_pill(id),
+    status_id                   INTEGER NOT NULL REFERENCES modified_pill_status(id),
     event_datetime              TIMESTAMP NOT NULL,
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
 );
@@ -112,7 +119,7 @@ CREATE TABLE profile_device (
 
 CREATE TABLE loaded_pill (
     id                          SERIAL PRIMARY KEY,
-    pill_id                     INTEGER NOT NULL REFERENCES pill(id),
+    modified_pill_id            INTEGER NOT NULL REFERENCES modified_pill(id),
     profile_device_id           INTEGER NOT NULL REFERENCES profile_device(id),
     position                    INTEGER NOT NULL,
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())

@@ -3,14 +3,14 @@ import { Routine } from "./routines/routine";
 import { WeekdaysRoutine } from "./routines/weekdays_routine";
 
 export default class RoutineFactory{
-    static createRoutine(routineType: string, routineData: object): Routine | null {
+    static createRoutine(routineType: string): Routine {
         switch (routineType) {
             case "weekdays":
-                return new WeekdaysRoutine(routineData);
+                return new WeekdaysRoutine();
             case "dayPeriod":
-                return new DayPeriodRoutine(routineData);
+                return new DayPeriodRoutine();
             default:
-                return null
+                throw new Error("Deu coco aquiiiii")
         }
     }
 }

@@ -42,8 +42,6 @@ function createSignedToken(accountKey, {
         algorithm: "RS256"
     });
 
-    console.log(signed)
-
     return signed
 }
 

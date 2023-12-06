@@ -9,6 +9,7 @@ import { profileRoutes } from "./routes/profile_routes";
 import { deviceRoutes } from "./routes/device_routes";
 import { profileDeviceRoutes } from "./routes/profile_device_routes";
 import { pillRoutineRoutes } from "./routes/pill_routine_routes";
+import { modifiedPillRoutes } from "./routes/modified_pill_routes";
 
 interface SchemaCompilers {
   body: Ajv;
@@ -104,6 +105,7 @@ AppDataSource.initialize()
     server.register(deviceRoutes);
     server.register(profileDeviceRoutes);
     server.register(pillRoutineRoutes);
+    server.register(modifiedPillRoutes);
 
     server.listen({ port: 8080, host: "0.0.0.0" })
       .then((address) => console.log(`server listening on ${address}`))

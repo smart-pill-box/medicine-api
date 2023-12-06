@@ -107,6 +107,32 @@ async function getProfilePillRoutines(accountKey, profileKey, authorization=null
     return response;
 };
 
+async function postModifiedPill(accountKey, profileKey, pillRoutineKey, body, authorization=null){
+    await createJwkExpectation()
+    if (!authorization){
+        authorization = createSignedToken(accountKey)
+    }
+
+    const response = await request.post(
+        `/account/${accountKey}/profile/${profileKey}/pill_routine/${pillRoutineKey}/modified_pill`
+    ).set("authorization", authorization).send(body);
+
+    return response;
+};
+
+async function getModifiedPills(accountKey, profileKey, pillRoutineKey, authorization=null){
+    await createJwkExpectation()
+    if (!authorization){
+        authorization = createSignedToken(accountKey)
+    }
+
+    const response = await request.get(
+        `/account/${accountKey}/profile/${profileKey}/pill_routine/${pillRoutineKey}/modified_pills`
+    ).set("authorization", authorization)
+
+    return response;
+}
+
 module.exports = {
     postAccount,
     getAccount,
@@ -118,4 +144,6 @@ module.exports = {
     postProfileDevice,
     postPillRoutine,
     getProfilePillRoutines,
+    postModifiedPill,
+    getModifiedPills,
 }

@@ -90,3 +90,39 @@ export class TokenNotBeforeNBF extends CustomError {
         super(code, description, statusCode)
     }
 }
+
+export class NotFoundModifiedPillStatus extends CustomError {
+    constructor(status: string){
+        const code = "ERR00006";
+        const description = `The modified pill status ${status} does not exists`
+        const statusCode = 404;
+        super(code, description, statusCode)
+    }
+}
+
+export class InvalidTimestampString extends CustomError {
+    constructor(timestamp: string){
+        const code = "ERR00007";
+        const description = `The given timestamp ${timestamp} string is not valid or is not ISO `
+        const statusCode = 400;
+        super(code, description, statusCode)
+    }
+}
+
+export class DontHaveAPillInThatTime extends CustomError {
+    constructor(givenDatetime: string){
+        const code = "ERR00008";
+        const description = `The given pill datetime ${givenDatetime} is not a valid datetime for that pillRoutine, so is impossible to modify it`
+        const statusCode = 400;
+        super(code, description, statusCode)
+    }
+}
+
+export class NotFoundPillRoutine extends CustomError {
+    constructor(){
+        const code = "ERR00009";
+        const description = "Not found pill routine on that account and profile";
+        const statusCode = 404;
+        super(code, description, statusCode)
+    }
+}

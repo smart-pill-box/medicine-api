@@ -73,12 +73,19 @@ class PillRoutineBodyGenerator{
 
         return {
             pillRoutineType: "dayPeriod",
-            name: "Test Routine name",
+            name: uuidv4(),
             pillRoutineData:{
                 pillsTimes: pillsTimes,
                 periodInDays: periodInDays
             }
         }
+    }
+};
+
+function createModifiedPillBody(status, pillDatetime){
+    return {
+        status: status,
+        pillDatetime: pillDatetime
     }
 }
 
@@ -87,5 +94,6 @@ module.exports = {
     createProfileBody,
     createDeviceBody,
     createProfileDeviceBody,
-    PillRoutineBodyGenerator
+    PillRoutineBodyGenerator,
+    createModifiedPillBody,
 }

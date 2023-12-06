@@ -1,13 +1,24 @@
 import { SchemaError, WeekdaysPillRoutineNeedOneDay } from "../../errors/custom_errors";
+import { PillRoutine } from "../../models";
+import DateUtils from "../date_utils";
 import { Routine } from "./routine";
 import Ajv from "ajv";
 
+const dayNumberToString: {[key: number]: string} = {
+    0: "sunday",
+    1: "monday",
+    2: "tuesday",
+    3: "wednesday",
+    4: "thursday",
+    5: "friday",
+    6: "saturday"
+}
+
 export class WeekdaysRoutine extends Routine{
-    routineData: object
     routineDataSchema: object;
 
-    constructor(routineData: object){
-        super(routineData)
+    constructor(){
+        super()
 
         this.routineDataSchema = {
             type: "object",
@@ -73,20 +84,39 @@ export class WeekdaysRoutine extends Routine{
         };
     }
 
-    validateRoutineData(): void {
+    validateRoutineData(routineData: object): void {
         const ajv = new Ajv();
 
         const validator = ajv.compile(this.routineDataSchema);
 
-        if (!validator(this.routineData)){
+        if (!validator(routineData)){
             if(!validator.errors){
                 throw new Error();
             }
             throw new SchemaError(validator.errors)
         }
 
-        if(Object.keys(this.routineData).length == 0){
+        if(Object.keys(routineData).length == 0){
             throw new WeekdaysPillRoutineNeedOneDay();
         }
+    }
+
+    getQuantityOfPillsByDatetime(pillDatetime: Date, { pillRoutineData, startDate }: PillRoutine){
+        const pillTimesStrings: string[]|undefined = pillRoutineData[dayNumberToString[pillDatetime.getDay()]]
+
+        if(!pillTimesStrings){
+            return 0;
+        }
+
+        const sentPillTimeString = DateUtils.getHourString(pillDatetime);
+
+        let quantity = 0;
+        pillTimesStrings.forEach(((pillTimeString: string)=>{
+            if(pillTimeString == sentPillTimeString){
+                quantity += 1;
+            }
+        }))
+
+        return quantity;
     }
 }
