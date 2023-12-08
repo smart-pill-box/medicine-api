@@ -58,6 +58,7 @@ class PillRoutineObjectGenerator{
         );
 
         const response = await postPillRoutine(accounKey, profileKey, body);
+        expect(response.status).toBe(201);
 
         return response.body;
     }
@@ -82,8 +83,6 @@ async function createModifiedPill(accountKey, profileKey, pillRoutineKey, status
 
     const response = await postModifiedPill(accountKey, profileKey, pillRoutineKey, body);
 
-    console.log(response.body);
-    console.log(pillRoutineKey);
     expect(response.status).toBe(201);
 
     return response.body;

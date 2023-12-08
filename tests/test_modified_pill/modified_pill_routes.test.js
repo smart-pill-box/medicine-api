@@ -24,8 +24,6 @@ describe("Modified pill routes", async ()=>{
             const body = createModifiedPillBody("manualyConfirmed", pillDatetime.toISOString());
             const response = await postModifiedPill(accountKey, profileKey, pillRoutineKey, body, "lalala")
 
-            console.log(response.body);
-            console.log(pillDatetime.toISOString());
 
             expect(response.status).toBe(401)
             expect(response.body.code).toBe("JWT_ERROR");
@@ -285,7 +283,6 @@ describe("Modified pill routes", async ()=>{
             datetimeStr = datetimeStr.slice(0,5) + "13" + datetimeStr.slice(7)
             const body = createModifiedPillBody("manualyConfirmed", datetimeStr);
             const response = await postModifiedPill(accountKey, profileKey, pillRoutineKey, body)
-            console.log(datetimeStr);
 
             expect(response.status).toBe(400);
             expect(response.body.code).toBe("ERR00007");
@@ -327,20 +324,16 @@ describe("Modified pill routes", async ()=>{
                 12,
                 0,
             )
-            console.log(pillDatetime.getTimezoneOffset())
 
             const body = createModifiedPillBody("manualyConfirmed", pillDatetime.toISOString());
-            console.log(body);
             let response = await postModifiedPill(accountKey, profileKey, pillRoutineKey, body)
 
-            console.log(response.body);
 
             expect(response.status).toBe(201);
             expect(response.body.status).toBe("manualyConfirmed");
 
             response = await getModifiedPills(accountKey, profileKey, pillRoutineKey);
 
-            console.log(response.body);
             expect(response.status).toBe(200);
             expect(response.body.data.length).toBe(1);
             expect(response.body.data[0].status).toBe("manualyConfirmed");
@@ -362,20 +355,16 @@ describe("Modified pill routes", async ()=>{
                 12,
                 0,
             )
-            console.log(pillDatetime.getTimezoneOffset())
 
             const body = createModifiedPillBody("manualyConfirmed", pillDatetime.toISOString());
-            console.log(body);
             let response = await postModifiedPill(accountKey, profileKey, pillRoutineKey, body)
 
-            console.log(response.body);
 
             expect(response.status).toBe(201);
             expect(response.body.status).toBe("manualyConfirmed");
 
             response = await getModifiedPills(accountKey, profileKey, pillRoutineKey);
 
-            console.log(response.body);
             expect(response.status).toBe(200);
             expect(response.body.data.length).toBe(1);
             expect(response.body.data[0].status).toBe("manualyConfirmed");
@@ -409,20 +398,16 @@ describe("Modified pill routes", async ()=>{
                 13,
                 30,
             )
-            console.log(pillDatetime.getTimezoneOffset())
 
             const body = createModifiedPillBody("manualyConfirmed", pillDatetime.toISOString());
-            console.log(body);
             let response = await postModifiedPill(accountKey, profileKey, pillRoutineKey, body)
 
-            console.log(response.body);
 
             expect(response.status).toBe(201);
             expect(response.body.status).toBe("manualyConfirmed");
 
             response = await getModifiedPills(accountKey, profileKey, pillRoutineKey);
 
-            console.log(response.body);
             expect(response.status).toBe(200);
             expect(response.body.data.length).toBe(1);
             expect(response.body.data[0].status).toBe("manualyConfirmed");
@@ -455,20 +440,16 @@ describe("Modified pill routes", async ()=>{
                 13,
                 30,
             )
-            console.log(pillDatetime.getTimezoneOffset())
 
             const body = createModifiedPillBody("manualyConfirmed", pillDatetime.toISOString());
-            console.log(body);
             let response = await postModifiedPill(accountKey, profileKey, pillRoutineKey, body)
 
-            console.log(response.body);
 
             expect(response.status).toBe(201);
             expect(response.body.status).toBe("manualyConfirmed");
 
             response = await getModifiedPills(accountKey, profileKey, pillRoutineKey);
 
-            console.log(response.body);
             expect(response.status).toBe(200);
             expect(response.body.data.length).toBe(1);
             expect(response.body.data[0].quantity).toBe(2);
@@ -496,7 +477,6 @@ describe("Modified pill routes", async ()=>{
 
             const response = await getModifiedPills(accountKey, profileKey, pillRoutineKey, "lalala")
 
-            console.log(response.body);
             expect(response.status).toBe(401)
             expect(response.body.code).toBe("JWT_ERROR");
         });
@@ -651,7 +631,6 @@ describe("Modified pill routes", async ()=>{
             );
 
             let response = await getModifiedPills(accountKey, profileKey, pillRoutine1.pillRoutineKey)
-            console.log(response.body);
 
             expect(response.status).toBe(200)
             expect(response.body.data.length).toBe(0);

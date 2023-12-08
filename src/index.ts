@@ -82,7 +82,10 @@ AppDataSource.initialize()
     })
 
     server.addHook("onRequest", async (req, resp)=>{
-      console.log("Request Hook");
+      console.log("\n---------------------")
+      console.log("Req ", req.method, " ", req.url);
+      console.log(req.body)
+
       const queryRunner = AppDataSource.createQueryRunner();
       await queryRunner.connect();
       await queryRunner.startTransaction();
@@ -91,8 +94,9 @@ AppDataSource.initialize()
   
     });
 
-    server.addHook("onSend", async (req, resp) => {
-      console.log("Send hook");
+    server.addHook("onSend", async (req, resp, payload) => {
+      console.log("Resp ", resp.statusCode, " ", payload);
+      console.log("---------------------\n");
 
       if (resp.statusCode < 300){
         await req.transaction.commitTransaction();

@@ -59,7 +59,6 @@ describe("Pill Routine Routes", async ()=>{
             const body = PillRoutineBodyGenerator.createDayPeriodPillRoutineBody();
             const response = await postPillRoutine(account2.accountKey, profileKey, body);
 
-            console.log(response.body);
             expect(response.status).toBe(404);
             expect(response.body.code).toBe("ERR00002");
         });
@@ -108,7 +107,6 @@ describe("Pill Routine Routes", async ()=>{
                 body.pillRoutineData.other = "other";
                 const response = await postPillRoutine(accountKey, profileKey, body);
     
-                console.log(response.body);
                 expect(response.status).toBe(400);
                 expect(response.body.code).toBe("SCHEMA_ERR");
             });
@@ -156,7 +154,6 @@ describe("Pill Routine Routes", async ()=>{
                 let body = PillRoutineBodyGenerator.createWeekdaysPillRoutineBody({});
                 const response = await postPillRoutine(accountKey, profileKey, body);
     
-                console.log(response.body)
                 expect(response.status).toBe(400);
                 expect(response.body.code).toBe("ERR00005");
             });
@@ -170,7 +167,6 @@ describe("Pill Routine Routes", async ()=>{
                     tuesday: ["11:00", "20:35"]
                 });
                 let response = await postPillRoutine(accountKey, profileKey, body);
-                console.log(response.body);
     
                 expect(response.status).toBe(201);
 
@@ -192,7 +188,6 @@ describe("Pill Routine Routes", async ()=>{
                     tuesday: ["11:00", "20:35"]
                 });
                 let response = await postPillRoutine(accountKey, profileKey, body);
-                console.log(response.body);
     
                 expect(response.status).toBe(201);
 

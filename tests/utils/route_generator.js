@@ -131,6 +131,19 @@ async function getModifiedPills(accountKey, profileKey, pillRoutineKey, authoriz
     ).set("authorization", authorization)
 
     return response;
+};
+
+async function getProfilePills(accountKey, profileKey, queryParams, authorization=null){
+    await createJwkExpectation()
+    if (!authorization){
+        authorization = createSignedToken(accountKey)
+    }
+
+    const response = await request.get(
+        `/account/${accountKey}/profile/${profileKey}/pills`
+    ).set("authorization", authorization).query(queryParams);
+
+    return response;
 }
 
 module.exports = {
@@ -146,4 +159,5 @@ module.exports = {
     getProfilePillRoutines,
     postModifiedPill,
     getModifiedPills,
+    getProfilePills,
 }

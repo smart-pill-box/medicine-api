@@ -8,6 +8,7 @@ import RoutineFactory from "../utils/routine_factory";
 import validateToken from "../utils/authorization_validator";
 import { createModifiedPillSchema } from "../schemas/modified_pill_schemas";
 import DateUtils from "../utils/date_utils";
+import { PillStatus } from "../concepts/pill";
 
 export default class ModifiedPillController {
     transaction: QueryRunner;
@@ -45,7 +46,7 @@ export default class ModifiedPillController {
 
         const modifiedPillStatus = await this.transaction.manager.findOne(ModifiedPillStatus, {
             where: {
-                enumerator: status
+                enumerator: status as PillStatus
             }
         });
         if(!modifiedPillStatus){

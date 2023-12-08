@@ -1,10 +1,11 @@
 import { FastifyInstance } from 'fastify';
 import { FromSchema } from "json-schema-to-ts";
-import { createProfileSchema, getProfileSchema, getProfileDevicesSchema, getProfilePillRoutinesSchema } from '../schemas/profile_schemas';
+import { createProfileSchema, getProfileSchema, getProfileDevicesSchema, getProfilePillRoutinesSchema, getProfilePillsSchema } from '../schemas/profile_schemas';
 import ProfileController from '../controllers/profile_controller';
 import { ProfileDto } from '../dtos/profile_dto';
 import { DeviceDto } from '../dtos/device_dto';
 import { PillRoutineDto } from '../dtos/pill_routine_dto';
+import { PillDto } from '../dtos/pill_dto';
 
 export async function profileRoutes(server: FastifyInstance){
     server.get<{ 
@@ -98,5 +99,31 @@ export async function profileRoutes(server: FastifyInstance){
             resp.status(201).send(
                 ProfileDto.toClientResponse(profile)
             );
+    });
+
+    server.get<{
+        Params: FromSchema<typeof getProfilePillsSchema.params>,
+        Querystring: FromSchema<typeof getProfilePillsSchema.querystring>,
+        Headers: FromSchema<typeof getProfilePillsSchema.headers>
+    }>(
+        "/account/:accountKey/profile/:profileKey/pills",
+        {
+            schema: getProfilePillsSchema
+        },
+        async (req, resp)=>{
+            const profileController = new ProfileController(req.transaction)
+
+            const { accountKey, profileKey } = req.params;
+            const pills = await profileController.getProfilePills(accountKey, profileKey, req.query, req.headers.authorization)
+
+            const data = pills.map(pill => PillDto.toClientResponse(pill));
+
+            resp.status(200).send({
+                isLastPage: true,
+                page: 0,
+                limit: 99999,
+                data: data
+            });
     }); 
+    
 }
