@@ -107,14 +107,14 @@ async function getProfilePillRoutines(accountKey, profileKey, authorization=null
     return response;
 };
 
-async function postModifiedPill(accountKey, profileKey, pillRoutineKey, body, authorization=null){
+async function putPillStatus(accountKey, profileKey, pillRoutineKey, pillDatetime, body, authorization=null){
     await createJwkExpectation()
     if (!authorization){
         authorization = createSignedToken(accountKey)
     }
 
-    const response = await request.post(
-        `/account/${accountKey}/profile/${profileKey}/pill_routine/${pillRoutineKey}/modified_pill`
+    const response = await request.put(
+        `/account/${accountKey}/profile/${profileKey}/pill_routine/${pillRoutineKey}/pill/${pillDatetime}/status`
     ).set("authorization", authorization).send(body);
 
     return response;
@@ -144,7 +144,33 @@ async function getProfilePills(accountKey, profileKey, queryParams, authorizatio
     ).set("authorization", authorization).query(queryParams);
 
     return response;
-}
+};
+
+async function postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime, body, authorization=null){
+    await createJwkExpectation()
+    if (!authorization){
+        authorization = createSignedToken(accountKey)
+    }
+
+    const response = await request.post(
+        `/account/${accountKey}/profile/${profileKey}/pill_routine/${pillRoutineKey}/pill/${pillDatetime}/reeschadule`
+    ).set("authorization", authorization).send(body);
+
+    return response;
+};
+
+async function getPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime, authorization=null){
+    await createJwkExpectation()
+    if (!authorization){
+        authorization = createSignedToken(accountKey)
+    }
+
+    const response = await request.get(
+        `/account/${accountKey}/profile/${profileKey}/pill_routine/${pillRoutineKey}/pill/${pillDatetime}/reeschadule`
+    ).set("authorization", authorization);
+
+    return response;
+};
 
 module.exports = {
     postAccount,
@@ -157,7 +183,9 @@ module.exports = {
     postProfileDevice,
     postPillRoutine,
     getProfilePillRoutines,
-    postModifiedPill,
+    putPillStatus,
     getModifiedPills,
     getProfilePills,
+    postPillReeschadule,
+    getPillReeschadule,
 }

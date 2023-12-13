@@ -9,6 +9,7 @@ import { PillRoutineType } from "./pill_routine_type";
 import { ModifiedPillStatus } from "./modified_pill_status";
 import { ModifiedPill } from "./modified_pill";
 import { ModifiedPillStatusEvent } from "./modified_pill_status_event";
+import { PillReeschadule } from "./pill_reeschadule";
 
 export {
   Account,
@@ -22,4 +23,5 @@ export {
   ModifiedPillStatus,
   ModifiedPill,
   ModifiedPillStatusEvent,
+  PillReeschadule,
 };

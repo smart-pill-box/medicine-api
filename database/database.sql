@@ -81,9 +81,12 @@ CREATE TABLE modified_pill_status (
 );
 
 INSERT INTO modified_pill_status (enumerator) VALUES
+('created'),
 ('loaded'),
+('reeschaduled'),
 ('canceled'),
 ('manualyConfirmed'),
+('pending'),
 ('pillBoxConfirmed');
 
 CREATE TABLE modified_pill (
@@ -101,6 +104,13 @@ CREATE TABLE modified_pill_status_event (
     modified_pill_id            INTEGER NOT NULL REFERENCES modified_pill(id),
     status_id                   INTEGER NOT NULL REFERENCES modified_pill_status(id),
     event_datetime              TIMESTAMP NOT NULL,
+    created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
+);
+
+CREATE TABLE pill_reeschadule (
+    id                          SERIAL PRIMARY KEY,
+    reeschaduled_pill_id        INTEGER NOT NULL REFERENCES modified_pill(id),
+    new_pill_id                 INTEGER NOT NULL REFERENCES modified_pill(id),
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
 );
 

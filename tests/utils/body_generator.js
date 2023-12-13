@@ -82,12 +82,18 @@ class PillRoutineBodyGenerator{
     }
 };
 
-function createModifiedPillBody(status, pillDatetime){
+function createUpdatePillBody(status, pillDatetime){
     return {
         status: status,
         pillDatetime: pillDatetime
     }
-}
+};
+
+function createPillReeschaduleBody(newPillDatetime){
+    return {
+        newPillDatetime: newPillDatetime
+    }
+};
 
 module.exports = {
     createAccountBody,
@@ -95,5 +101,6 @@ module.exports = {
     createDeviceBody,
     createProfileDeviceBody,
     PillRoutineBodyGenerator,
-    createModifiedPillBody,
+    createUpdatePillBody,
+    createPillReeschaduleBody,
 }

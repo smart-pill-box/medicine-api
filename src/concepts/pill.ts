@@ -1,18 +1,19 @@
 import { isEqual } from "date-fns";
 import { ModifiedPill, ModifiedPillStatusEvent, PillRoutine } from "../models";
 
-export type PillStatus = "pending" | "loaded" | "canceled" | "manualyConfirmed" | "pillBoxConfirmed"; 
+export type PillStatus = "pending" | "loaded" | "canceled" | "manualyConfirmed" | "pillBoxConfirmed" | "created" | "reeschaduled"; 
 
 export class Pill {
     status: PillStatus;
     statusEvents: ModifiedPillStatusEvent[];
     pillDatetime: Date;
+    reeschaduledTo?: Pill;
     pillRoutineKey: string;
     pillRoutineId: number;
     quantity: number;
     name: string;
 
-    constructor (pillDatetime: Date, name: string, pillRoutine: PillRoutine, status: PillStatus, statusEvents: ModifiedPillStatusEvent[], quantity: number){
+    constructor (pillDatetime: Date, name: string, pillRoutine: PillRoutine, status: PillStatus, statusEvents: ModifiedPillStatusEvent[], quantity: number, reeschaduledTo?: Pill){
         this.status = status;
         this.statusEvents = statusEvents;
         this.pillDatetime = pillDatetime;
@@ -22,14 +23,14 @@ export class Pill {
         this.name = name;
     }
 
-    static fromModifiedPill(modifiedPill: ModifiedPill){
+    static fromModifiedPill(modifiedPill: ModifiedPill): Pill{
         const pill = new Pill(
             modifiedPill.pillDatetime, 
             modifiedPill.pillRoutine.name,
             modifiedPill.pillRoutine,
             modifiedPill.status.enumerator,
             modifiedPill.statusEvents,
-            modifiedPill.quantity,
+            modifiedPill.quantity
         );
 
         return pill;

@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany, OneToOne, ManyToOne, JoinColumn } from "typeorm";
-import { PillRoutineStatus, PillRoutine, ModifiedPillStatusEvent, ModifiedPillStatus } from ".";
+import { PillRoutineStatus, PillRoutine, ModifiedPillStatusEvent, ModifiedPillStatus, PillReeschadule } from ".";
 
 @Entity({ name: "modified_pill" })
 export class ModifiedPill {
@@ -21,6 +21,9 @@ export class ModifiedPill {
         eager: true
     })
     statusEvents: ModifiedPillStatusEvent[];
+
+    @OneToOne(()=>PillReeschadule, (pillReeschadule) => pillReeschadule.reeschaduledPill)
+    pillReeschadule: PillReeschadule;
 
     @Column({type: "timestamp", "name": "pill_datetime"})
     pillDatetime: Date;

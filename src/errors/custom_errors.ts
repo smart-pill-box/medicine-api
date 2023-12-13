@@ -126,3 +126,48 @@ export class NotFoundPillRoutine extends CustomError {
         super(code, description, statusCode)
     }
 }
+
+export class InvalidStatusForPillUpdate extends CustomError {
+    constructor(status: string){
+        const code = "ERR00010";
+        const description = `You can't manualy update the status of a pill to ${status}`;
+        const statusCode = 400;
+        super(code, description, statusCode)
+    }
+}
+
+export class DuplicatedPill extends CustomError {
+    constructor(pillDatetime: string){
+        const code = "ERR00011";
+        const description = `A pill in the datetime ${pillDatetime} already exists`;
+        const statusCode = 408;
+        super(code, description, statusCode)
+    }
+}
+
+export class NotFoundPill extends CustomError {
+    constructor(pillDatetime: string){
+        const code = "ERR00012";
+        const description = `A pill in the time ${pillDatetime} was not found`
+        const statusCode = 404;
+        super(code, description, statusCode)
+    }
+}
+
+export class InvalidPillStatusForReeschadule extends CustomError {
+    constructor(pillStatus: string){
+        const code = "ERR00013";
+        const description = `You can't reeschadule a pill with status ${pillStatus}`
+        const statusCode = 400;
+        super(code, description, statusCode)
+    }
+}
+
+export class NotFoundPillReeschadule extends CustomError {
+    constructor(){
+        const code = "ERR00014";
+        const description = "The selected pill was never reeschaduled"
+        const statusCode = 404;
+        super(code, description, statusCode)
+    }
+}
