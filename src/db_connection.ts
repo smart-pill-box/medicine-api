@@ -17,11 +17,11 @@ import {
 
 export const AppDataSource = new DataSource({
     type: "postgres",
-    host: "db",
-    port: 5432,
-    username: "my_user",
-    password: "my_pwd",
-    database: "my_db",
+    host: process.env.MEDICINE_API_DB_HOST,
+    port: process.env.MEDICINE_API_DB_PORT,
+    username: process.env.MEDICINE_API_DB_USER,
+    password: process.env.MEDICINE_API_DB_PASS,
+    database: process.env.MEDICINE_API_DB_NAME,
     synchronize: false,
     logging: false,
     entities: [
