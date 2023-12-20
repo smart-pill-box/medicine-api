@@ -35,6 +35,7 @@ CREATE TABLE pill_routine_status (
 
 INSERT INTO pill_routine_status (enumerator) VALUES 
 ('active'),
+('updated'),
 ('canceled');
 
 
@@ -44,12 +45,12 @@ CREATE TABLE pill_routine (
     pill_routine_type_id        INTEGER NOT NULL REFERENCES pill_routine_type(id),
     status_id                   INTEGER NOT NULL REFERENCES pill_routine_status(id),
     pill_routine_key            CHAR(36) NOT NULL,
-    start_date                  DATE NOT NULL,
-    expiration_date             DATE,
+    start_datetime              TIMESTAMP NOT NULL,
+    expiration_datetime         TIMESTAMP,
     pill_routine_data           JSONB NOT NULL,
     name                        VARCHAR(255) NOT NULL,
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW()),
-    UNIQUE(name, profile_id)
+    UNIQUE(pill_routine_key)
 );
 
 CREATE TABLE pill_routine_status_event (
@@ -57,6 +58,13 @@ CREATE TABLE pill_routine_status_event (
     status_id                   INTEGER NOT NULL REFERENCES pill_routine_status(id),
     pill_routine_id             INTEGER NOT NULL REFERENCES pill_routine(id),
     event_datetime              TIMESTAMP NOT NULL,
+    created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
+);
+
+CREATE TABLE pill_routine_version (
+    id                          SERIAL PRIMARY KEY,
+    origin_routine_id           INTEGER NOT NULL REFERENCES pill_routine(id),
+    updated_routine_id          INTEGER NOT NULL REFERENCES pill_routine(id),
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
 );
 

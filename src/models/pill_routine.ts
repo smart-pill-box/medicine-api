@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany, OneToOne, ManyToMany, ManyToOne, JoinColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany, ManyToOne, JoinColumn } from "typeorm";
 import { PillRoutineStatus, PillRoutineStatusEvent, PillRoutineType, Profile } from ".";
 
 @Entity({ name: "pill_routine" })
@@ -31,11 +31,11 @@ export class PillRoutine {
     @Column({ type: "char", length: 36, name: "pill_routine_key" })
     pillRoutineKey: string;
 
-    @Column({ type: "date", name: "start_date" })
-    startDate: string;
+    @Column({ type: "timestamp", name: "start_datetime" })
+    startDatetime: Date;
 
-    @Column({ type: "date", name: "expiration_date" })
-    expirationDate: string;
+    @Column({ type: "timestamp", name: "expiration_datetime", nullable: true })
+    expirationDatetime: Date | undefined;
 
     @Column({ type: "jsonb", name: "pill_routine_data" })
     pillRoutineData: {[key: string]: any};

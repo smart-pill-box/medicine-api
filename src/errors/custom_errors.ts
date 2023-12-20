@@ -171,3 +171,21 @@ export class NotFoundPillReeschadule extends CustomError {
         super(code, description, statusCode)
     }
 }
+
+export class CantCreateRoutineStartingOnThePast extends CustomError {
+    constructor(){
+        const code = "ERR00015";
+        const description = "A Pill Routine start date can't be on the past"
+        const statusCode = 400;
+        super(code, description, statusCode)
+    }
+}
+
+export class ExpirationDateCantBeBeforeStartDate extends CustomError {
+    constructor(){
+        const code = "ERR00016";
+        const description = "A Pill Routine expiration date must be after the start date (or today if not given)"
+        const statusCode = 400;
+        super(code, description, statusCode)
+    }
+}

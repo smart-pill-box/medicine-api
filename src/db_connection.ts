@@ -12,6 +12,7 @@ import {
     ModifiedPill,
     ModifiedPillStatusEvent,
     PillReeschadule,
+    PillRoutineVersion,
 } from "./models";
 
 export const AppDataSource = new DataSource({
@@ -36,5 +37,6 @@ export const AppDataSource = new DataSource({
         ModifiedPill,
         ModifiedPillStatusEvent,
         PillReeschadule,
+        PillRoutineVersion,
     ],
 });

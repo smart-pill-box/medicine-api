@@ -44,7 +44,9 @@ class PillRoutineBodyGenerator{
             friday=null,
             saturday=null,
             sunday=null
-        }
+        },
+        startDatetime=null,
+        expirationDatetime=null,
     ){
         let routineData = {
             ...(monday !== null && { monday: monday }),
@@ -59,11 +61,13 @@ class PillRoutineBodyGenerator{
         return {
             pillRoutineType: "weekdays",
             name: "Test Routine name",
-            pillRoutineData: routineData
+            pillRoutineData: routineData,
+            ...(startDatetime !== null && { startDatetime: startDatetime }),
+            ...(expirationDatetime !== null && { expirationDatetime: expirationDatetime }),
         }
     }
 
-    static createDayPeriodPillRoutineBody(periodInDays=null, pillsTimes=null){
+    static createDayPeriodPillRoutineBody(periodInDays=null, pillsTimes=null, startDatetime=null, expirationDatetime=null){
         if (!periodInDays){
             periodInDays = 2;
         }
@@ -77,7 +81,9 @@ class PillRoutineBodyGenerator{
             pillRoutineData:{
                 pillsTimes: pillsTimes,
                 periodInDays: periodInDays
-            }
+            },
+            ...(startDatetime !== null && { startDatetime: startDatetime }),
+            ...(expirationDatetime !== null && { expirationDatetime: expirationDatetime }),
         }
     }
 };
@@ -95,6 +101,20 @@ function createPillReeschaduleBody(newPillDatetime){
     }
 };
 
+function createUpdatePillRoutineBody(
+    pillRoutineType=null,
+    pillRoutineData=null,
+    startDatetime=null,
+    expirationDatetime=null,
+){
+    return {
+        ...(pillRoutineType !== null && { pillRoutineType: pillRoutineType }),
+        ...(pillRoutineData !== null && { pillRoutineData: pillRoutineData }),
+        ...(startDatetime !== null && { startDatetime: startDatetime }),
+        ...(expirationDatetime !== null && { expirationDatetime: expirationDatetime }),
+    }
+}
+
 module.exports = {
     createAccountBody,
     createProfileBody,
@@ -103,4 +123,5 @@ module.exports = {
     PillRoutineBodyGenerator,
     createUpdatePillBody,
     createPillReeschaduleBody,
+    createUpdatePillRoutineBody,
 }

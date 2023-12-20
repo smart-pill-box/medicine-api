@@ -172,6 +172,19 @@ async function getPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDa
     return response;
 };
 
+async function putPillRoutine(accountKey, profileKey, pillRoutineKey, body, authorization=null){
+    await createJwkExpectation()
+    if (!authorization){
+        authorization = createSignedToken(accountKey)
+    }
+
+    const response = await request.put(
+        `/account/${accountKey}/profile/${profileKey}/pill_routine/${pillRoutineKey}`
+    ).set("authorization", authorization).send(body);
+
+    return response;
+};
+
 module.exports = {
     postAccount,
     getAccount,
@@ -188,4 +201,5 @@ module.exports = {
     getProfilePills,
     postPillReeschadule,
     getPillReeschadule,
+    putPillRoutine,
 }

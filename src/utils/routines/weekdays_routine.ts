@@ -103,9 +103,14 @@ export class WeekdaysRoutine extends Routine{
         }
     }
 
-    public getQuantityOfPillsByDatetime(pillDatetime: Date, { pillRoutineData, startDate }: PillRoutine){
+    public getQuantityOfPillsByDatetime(pillDatetime: Date, pillRoutine: PillRoutine){
+        const { pillRoutineData } = pillRoutine;
         const dayString = DateUtils.dayNumberToString(pillDatetime.getDay());
         const pillTimesStrings: string[]|undefined = pillRoutineData[dayString]
+
+        if(!this.isDatetimeInRoutineRange(pillRoutine, pillDatetime)){
+            return 0;
+        }
 
         if(!pillTimesStrings){
             return 0;
@@ -128,6 +133,9 @@ export class WeekdaysRoutine extends Routine{
         const { pillRoutineData, name } = pillRoutine;
 
         for(let dateIter = fromDate; differenceInDays(dateIter, toDate) <= 0; dateIter = addDays(dateIter, 1)){
+            if(!this.isDatetimeInRoutineRange(pillRoutine, dateIter)){
+                continue
+            } 
 
             const dayString = DateUtils.dayNumberToString(dateIter.getUTCDay());
 
@@ -143,6 +151,10 @@ export class WeekdaysRoutine extends Routine{
 
             let quantity = 1;
             pillsDatetimesSorted.forEach((pillDatetime, index)=>{
+                if(!this.isDatetimeInRoutineRange(pillRoutine, pillDatetime)){
+                    return
+                } 
+
                 if(isEqual(pillsDatetimesSorted[index+1], pillDatetime)){
                     quantity += 1;
                     return

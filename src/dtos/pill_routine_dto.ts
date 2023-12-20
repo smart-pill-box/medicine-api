@@ -15,8 +15,8 @@ export class PillRoutineDto {
             name: pillRoutine.name,
             status: pillRoutine.status.enumerator,
             pillRoutineType: pillRoutine.pillRoutineType.enumerator,
-            startDate: pillRoutine.startDate,
-            ...(pillRoutine.expirationDate ? { expirationDate: pillRoutine.expirationDate }: {}),
+            startDatetime: pillRoutine.startDatetime.toISOString(),
+            ...(pillRoutine.expirationDatetime && { expirationDatetime: pillRoutine.expirationDatetime.toISOString() }),
             pillRoutineData: pillRoutine.pillRoutineData,
             statusEvents: statusEvents
         };

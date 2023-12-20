@@ -1,4 +1,4 @@
-import { addDays, differenceInDays, isBefore, isEqual } from "date-fns";
+import { addDays, differenceInDays, isAfter, isBefore, isEqual } from "date-fns";
 import { SchemaError } from "../../errors/custom_errors";
 import { PillRoutine } from "../../models";
 import DateUtils from "../date_utils";
@@ -49,12 +49,14 @@ export class DayPeriodRoutine extends Routine{
         }
     }
 
-    getQuantityOfPillsByDatetime(pillDatetime: Date, { pillRoutineData, startDate: startDateString }: PillRoutine){
-        const startDate = DateUtils.dateStringToDate(startDateString);
+    getQuantityOfPillsByDatetime(pillDatetime: Date, pillRoutine: PillRoutine){
+        const { pillRoutineData, startDatetime, expirationDatetime, status, statusEvents } = pillRoutine;
+        const dayDifference = differenceInDays(startDatetime, pillDatetime);
+        if(dayDifference % pillRoutineData.periodInDays != 0){
+            return 0;
+        }
 
-        const dayDifference = differenceInDays(startDate, pillDatetime);
-
-        if (dayDifference % pillRoutineData.periodInDays != 0){
+        if(!this.isDatetimeInRoutineRange(pillRoutine, pillDatetime)){
             return 0;
         }
 
@@ -63,7 +65,6 @@ export class DayPeriodRoutine extends Routine{
 
         let quantity = 0;
         pillRoutineData.pillsTimes.forEach(((pillTimeString: string)=>{
-            console.log()
             if(pillTimeString == sentPillTimeString){
                 quantity += 1;
             }
@@ -75,25 +76,28 @@ export class DayPeriodRoutine extends Routine{
     public getPillsOrderedByDatetimeAsc(fromDate: Date, toDate: Date, pillRoutine: PillRoutine){
         const pills: Pill[] = [];
 
-        const { pillRoutineData, name, startDate: startDateString } = pillRoutine;
+        const { pillRoutineData, name, startDatetime } = pillRoutine;
         const { periodInDays, pillsTimes } = pillRoutineData;
-        const startDate = DateUtils.dateStringToDate(startDateString)
 
         let initialDate: Date;
-        if (fromDate.getTime() - startDate.getTime() > 0){
-            const daysUntilNextPill = differenceInDays(startDate, fromDate) % periodInDays;
+        if (isAfter(fromDate, startDatetime)){
+            const daysUntilNextPill = differenceInDays(startDatetime, fromDate) % periodInDays;
 
             initialDate = addDays(fromDate, daysUntilNextPill);
         }
         else {
-            initialDate = startDate;
+            initialDate = new Date(startDatetime);
+            initialDate.setUTCHours(0, 0, 0, 0);
         }
+        console.log("Start datetime is ", startDatetime.toISOString());
+        console.log("From date is ", fromDate.toISOString());
 
         console.log("Initial date is ", initialDate.toISOString());
 
         for(let dateIter = initialDate; differenceInDays(dateIter, toDate) <= 0; dateIter = addDays(dateIter, periodInDays)){
-            console.log("Iter: " + dateIter.toISOString());
-            console.log("To Date: " + toDate.toISOString());
+            if(!this.isDatetimeInRoutineRange(pillRoutine, dateIter)){
+                continue
+            }
 
             const pillsDatetimesSorted: Date[] = pillsTimes
                 .map((timeString: string) => DateUtils.sameDateOtherHour(dateIter, timeString))
@@ -102,6 +106,9 @@ export class DayPeriodRoutine extends Routine{
             let quantity = 1;
             console.log("Pills datetimes ", pillsDatetimesSorted);
             pillsDatetimesSorted.forEach((pillDatetime, index)=>{
+                if(!this.isDatetimeInRoutineRange(pillRoutine, pillDatetime)){
+                    return
+                }
                 if(isEqual(pillsDatetimesSorted[index+1], pillDatetime)){
                     quantity += 1;
                     return

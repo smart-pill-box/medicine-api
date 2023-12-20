@@ -30,7 +30,6 @@ export default class DateUtils {
     }
 
     static sameDateOtherHour(datetime: Date, hourString: String){
-        console.log("Received ", datetime.toISOString());
         const date = new Date(
             datetime.getUTCFullYear(),
             datetime.getUTCMonth(),
@@ -40,7 +39,6 @@ export default class DateUtils {
             0,
             0
         );
-        console.log("Created ", date.toISOString());
 
         return date;
     }

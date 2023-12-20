@@ -1,5 +1,5 @@
-const { createAccountBody, createProfileBody, createDeviceBody, createProfileDeviceBody, PillRoutineBodyGenerator, createUpdatePillBody, createPillReeschaduleBody } =  require("./body_generator");
-const { postAccount, postProfile, postDevice, postProfileDevice, postPillRoutine, putPillStatus, postPillReeschadule } =  require("./route_generator");
+const { createAccountBody, createProfileBody, createDeviceBody, createProfileDeviceBody, PillRoutineBodyGenerator, createUpdatePillBody, createPillReeschaduleBody, createUpdatePillRoutineBody } =  require("./body_generator");
+const { postAccount, postProfile, postDevice, postProfileDevice, postPillRoutine, putPillStatus, postPillReeschadule, putPillRoutine } =  require("./route_generator");
 
 
 async function createAccount(mainProfileName=null){
@@ -49,12 +49,14 @@ class PillRoutineObjectGenerator{
             friday=null,
             saturday=null,
             sunday=null
-        }
+        },
+        startDatetime=null,
+        expirationDatetime=null
     ){
         const body = PillRoutineBodyGenerator.createWeekdaysPillRoutineBody(
             {
                 monday, tuesday, wednesday, thursday, friday, saturday, sunday
-            }
+            }, startDatetime, expirationDatetime
         );
 
         const response = await postPillRoutine(accounKey, profileKey, body);
@@ -65,10 +67,10 @@ class PillRoutineObjectGenerator{
 
     static async createDayPeriodPillRoutine(
         accounKey, profileKey,
-        periodInDays=null, pillsTimes=null
+        periodInDays=null, pillsTimes=null, startDatetime=null, expirationDatetime=null
     ){
         const body = PillRoutineBodyGenerator.createDayPeriodPillRoutineBody(
-            periodInDays, pillsTimes
+            periodInDays, pillsTimes, startDatetime
         );
         const response = await postPillRoutine(accounKey, profileKey, body);
 
@@ -98,6 +100,23 @@ async function createPillReeschadule(accountKey, profileKey, pillRoutineKey, pil
     return response.body;
 }
 
+async function updatePillRoutine(
+    accounKey, 
+    profileKey, 
+    pillRoutineKey, 
+    pillRoutineType=null,
+    pillRoutineData=null,
+    startDatetime=null,
+    expirationDatetime=null,
+){
+    const body = createUpdatePillRoutineBody(pillRoutineType, pillRoutineData, startDatetime, expirationDatetime);
+    const response = await putPillRoutine(accounKey, profileKey, pillRoutineKey, body);
+
+    expect(response.status).toBe(201);
+
+    return response.body
+}
+
 module.exports = {
     createAccount,
     createProfile,
@@ -106,4 +125,5 @@ module.exports = {
     PillRoutineObjectGenerator,
     updatePillStatus,
     createPillReeschadule,
+    updatePillRoutine,
 }
