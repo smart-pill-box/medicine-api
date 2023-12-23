@@ -17,9 +17,11 @@ export abstract class Routine {
             return false;
         }
 
-        if(pillRoutine.status.enumerator == "updated"){
+        const canceledStatuses = ["updated", "canceled"];
+        if(canceledStatuses.includes(pillRoutine.status.enumerator)){
+            const routineStatus = pillRoutine.status.enumerator;
             for (let statusEvent of pillRoutine.statusEvents){
-                if(statusEvent.status.enumerator == "updated"){
+                if(statusEvent.status.enumerator == routineStatus){
                     if(statusEvent.eventDatetime.getTime() < datetime.getTime()){
                         return false;
                     }

@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { FromSchema } from "json-schema-to-ts";
-import { createPillRoutineSchema, getPillRoutineModifiedPills, getPillRoutineSchema, updatePillRoutineSchema } from '../schemas/pill_routine_schemas';
+import { createPillRoutineSchema, getPillRoutineModifiedPills, getPillRoutineSchema, updatePillRoutineSchema, updatePillRoutineStatusSchema } from '../schemas/pill_routine_schemas';
 import PillRoutineController from '../controllers/pill_routine_controller';
 import { PillRoutineDto } from '../dtos/pill_routine_dto';
 import { ModifiedPill } from '../models';
@@ -90,13 +90,13 @@ export async function pillRoutineRoutes(server: FastifyInstance){
     );
 
     server.put<{ 
-        Params: FromSchema<typeof updatePillStatusSchema.params>,
-        Body: FromSchema<typeof updatePillStatusSchema.body>,
-        Headers: FromSchema<typeof updatePillStatusSchema.headers>,
+        Params: FromSchema<typeof updatePillRoutineStatusSchema.params>,
+        Body: FromSchema<typeof updatePillRoutineStatusSchema.body>,
+        Headers: FromSchema<typeof updatePillRoutineStatusSchema.headers>,
     }>(
         "/account/:accountKey/profile/:profileKey/pill_routine/:pillRoutineKey/status",
         {
-            schema: updatePillStatusSchema
+            schema: updatePillRoutineStatusSchema
         },
         async (req, resp)=>{
             const pillRoutineController = new PillRoutineController(req.transaction);
