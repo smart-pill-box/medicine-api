@@ -25,5 +25,8 @@ export class Profile {
 
     @Column({ type: "varchar", length: 255, name: "name" })
     name: string;
+
+    @Column({ type: "integer", name: "avatar_number" })
+    avatarNumber: number
 }
 

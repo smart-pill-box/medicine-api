@@ -716,3 +716,5 @@ describe("PUT /account/:accountKey/profile/:profileKey/pill_routine/:pillRoutine
         expect(foundRoutines).toBe(1);
     });
 });
+
+// TODO test GET pillRoutine route

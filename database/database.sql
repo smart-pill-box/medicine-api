@@ -11,6 +11,7 @@ CREATE TABLE profile (
     account_id                  INTEGER NOT NULL REFERENCES account(id),
     profile_key                 CHAR(36) NOT NULL,
     name                        VARCHAR(255) NOT NULL,
+    avatar_number               INTEGER NOT NULL,
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW()),
     UNIQUE(profile_key)
 );

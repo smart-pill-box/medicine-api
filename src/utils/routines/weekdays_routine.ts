@@ -133,10 +133,6 @@ export class WeekdaysRoutine extends Routine{
         const { pillRoutineData, name } = pillRoutine;
 
         for(let dateIter = fromDate; differenceInDays(dateIter, toDate) <= 0; dateIter = addDays(dateIter, 1)){
-            if(!this.isDatetimeInRoutineRange(pillRoutine, dateIter)){
-                continue
-            } 
-
             const dayString = DateUtils.dayNumberToString(dateIter.getUTCDay());
 
             const pillsTimeStrings: string[] = pillRoutineData[dayString];

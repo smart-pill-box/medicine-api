@@ -18,7 +18,7 @@ export default class ProfileController {
 
     public async createProfile(accountKey: string,
     {
-        name
+        name, avatarNumber
     }: FromSchema<typeof createProfileSchema.body>, authorization: string) {
         const token = await validateToken(authorization);
         if (token.sub! != accountKey){
@@ -39,6 +39,7 @@ export default class ProfileController {
         newProfile.name = name;
         newProfile.profileKey = uuidv4();
         newProfile.account = account;
+        newProfile.avatarNumber = avatarNumber; 
 
         await this.transaction.manager.save(newProfile);
 
@@ -210,6 +211,9 @@ export default class ProfileController {
             if(modifiedPillsStack[modifiedPillsStack.length-1].isEqual(routinePillsStack[routinePillsStack.length-1])){
                 pills.push(modifiedPillsStack.pop()!);
                 routinePillsStack.pop()
+            }
+            else if(modifiedPillsStack[modifiedPillsStack.length-1].isGreaterThen(routinePillsStack[routinePillsStack.length-1])){
+                pills.push(modifiedPillsStack.pop()!);
             }
             else {
                 pills.push(routinePillsStack.pop()!);

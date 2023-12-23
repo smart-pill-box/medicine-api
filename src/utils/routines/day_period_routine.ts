@@ -95,10 +95,6 @@ export class DayPeriodRoutine extends Routine{
         console.log("Initial date is ", initialDate.toISOString());
 
         for(let dateIter = initialDate; differenceInDays(dateIter, toDate) <= 0; dateIter = addDays(dateIter, periodInDays)){
-            if(!this.isDatetimeInRoutineRange(pillRoutine, dateIter)){
-                continue
-            }
-
             const pillsDatetimesSorted: Date[] = pillsTimes
                 .map((timeString: string) => DateUtils.sameDateOtherHour(dateIter, timeString))
                 .sort((first: Date, next: Date)=> first.getTime()-next.getTime());

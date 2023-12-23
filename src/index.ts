@@ -10,6 +10,7 @@ import { deviceRoutes } from "./routes/device_routes";
 import { profileDeviceRoutes } from "./routes/profile_device_routes";
 import { pillRoutineRoutes } from "./routes/pill_routine_routes";
 import { pillRoutes } from "./routes/pill_routes";
+import cors from "@fastify/cors"
 
 interface SchemaCompilers {
   body: Ajv;
@@ -104,6 +105,7 @@ AppDataSource.initialize()
       await req.transaction.release();
     });
   
+    server.register(cors);
     server.register(accountRoutes);
     server.register(profileRoutes);
     server.register(deviceRoutes);

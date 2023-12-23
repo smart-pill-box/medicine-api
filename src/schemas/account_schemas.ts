@@ -6,10 +6,14 @@ export const createAccountSchema = {
                 type: "string",
                 minLength: 1,
                 maxLength: 255
+            },
+            mainProfileAvatarNumber: {
+                type: "integer",
+                minimum: 0
             }
         },
         required: [
-            "mainProfileName"
+            "mainProfileName", "mainProfileAvatarNumber"
         ],
         additionalProperties: false
     } as const,

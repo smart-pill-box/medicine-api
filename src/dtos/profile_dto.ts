@@ -8,6 +8,7 @@ export class ProfileDto {
         return {
             profileKey: profileKey,
             name: name,
+            avatarNumber: profile.avatarNumber
         };
     }
 }

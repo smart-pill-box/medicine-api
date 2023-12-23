@@ -1,20 +1,28 @@
 const { v4 : uuidv4 } = require("uuid")
 
-function createAccountBody(mainProfileName=null){
+function createAccountBody(mainProfileName=null, avatarNumber=null){
     if (!mainProfileName){
         mainProfileName = "test main profile name";
     }
+    if (!avatarNumber){
+        avatarNumber = 0
+    }
     return {
-        mainProfileName: mainProfileName
+        mainProfileName: mainProfileName,
+        mainProfileAvatarNumber: avatarNumber
     }
 };
 
-function createProfileBody(name=null){
+function createProfileBody(name=null, avatarNumber=null){
     if (!name){
         name = "test profile name";
     }
+    if (!avatarNumber){
+        avatarNumber = 0
+    }
     return {
-        name: name
+        name: name,
+        avatarNumber: avatarNumber
     }
 };
 

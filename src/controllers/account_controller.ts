@@ -35,7 +35,7 @@ export default class AccountController {
         return account;
     }
 
-    public async createAccount({ mainProfileName }: FromSchema<typeof createAccountSchema.body>, authorization: string): Promise<Account>{
+    public async createAccount({ mainProfileName, mainProfileAvatarNumber }: FromSchema<typeof createAccountSchema.body>, authorization: string): Promise<Account>{
         const token = await validateToken(authorization);
 
         const accountKey = token.sub!;
@@ -48,6 +48,7 @@ export default class AccountController {
         const mainProfile = new Profile();
         mainProfile.profileKey = mainProfileKey;
         mainProfile.name = mainProfileName;
+        mainProfile.avatarNumber = mainProfileAvatarNumber;
         
         newAccount.profiles = [mainProfile];
         await this.transaction.manager.save(newAccount);

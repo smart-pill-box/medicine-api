@@ -1,4 +1,4 @@
-import { isEqual } from "date-fns";
+import { isAfter, isEqual } from "date-fns";
 import { ModifiedPill, ModifiedPillStatusEvent, PillRoutine } from "../models";
 
 export type PillStatus = "pending" | "loaded" | "canceled" | "manualyConfirmed" | "pillBoxConfirmed" | "created" | "reeschaduled"; 
@@ -44,7 +44,7 @@ export class Pill {
             return false
         }
 
-        return this.pillDatetime > otherPill.pillDatetime;
+        return isAfter(this.pillDatetime, otherPill.pillDatetime);
     }
 
     public isGreaterOrEqual(otherPill: Pill){
@@ -55,7 +55,7 @@ export class Pill {
             return false
         }
 
-        return this.pillDatetime >= otherPill.pillDatetime;
+        return isAfter(this.pillDatetime, otherPill.pillDatetime) || isEqual(this.pillDatetime, otherPill.pillDatetime);
     }
 
     public isEqual(otherPill: Pill){

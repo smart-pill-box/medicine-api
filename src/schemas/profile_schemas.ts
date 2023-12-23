@@ -19,10 +19,14 @@ export const createProfileSchema = {
                 type: "string",
                 minLength: 1,
                 maxLength: 255
+            },
+            avatarNumber: {
+                type: "integer",
+                minimum: 0
             }
         },
         required: [
-            "name"
+            "name", "avatarNumber"
         ],
         additionalProperties: false
     } as const,

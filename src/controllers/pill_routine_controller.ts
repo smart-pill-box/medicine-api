@@ -101,6 +101,31 @@ export default class PillRoutineController {
         return pillRoutine;
     }
 
+    public async getPillRoutine(accountKey: string, profileKey: string, pillRoutineKey: string, authorization: string){
+        const token = await validateToken(authorization);
+        if (token.sub! != accountKey){
+            throw new UnauthorizedError()
+        }
+
+        const pillRoutine = await this.transaction.manager.findOne(PillRoutine, {
+            where: {
+                pillRoutineKey: pillRoutineKey,
+                profile: {
+                    profileKey: profileKey,
+                    account: {
+                        accountKey: accountKey
+                    }
+                }
+            }
+        })
+
+        if(!pillRoutine){
+            throw new NotFoundPillRoutine()
+        }
+
+        return pillRoutine;
+    }
+
     public async getPillRoutineModifiedPills(accountKey: string, profileKey: string, pillRoutineKey: string, authorization: string){
         const token = await validateToken(authorization);
         if (token.sub! != accountKey){

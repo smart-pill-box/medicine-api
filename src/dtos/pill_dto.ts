@@ -16,7 +16,8 @@ export class PillDto {
             statusEvents: statusEvents,
             pillDatetime: pill.pillDatetime.toISOString(),
             quantity: pill.quantity,
-            pillRoutineKey: pill.pillRoutineKey
+            pillRoutineKey: pill.pillRoutineKey,
+            name: pill.name
         };
     }
 }

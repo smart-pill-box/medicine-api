@@ -685,7 +685,13 @@ describe("GET pills Routes", ()=>{
 
         expect(response.status).toBe(200);
         expect(response.body.data.length).toBe(1);
-    })
+    });
+
+    // TODO test("When have a modified pill greater than the routine pill, push it first", async ()=>{
+        // Imagine routine pills like [10:00 , 12:00]
+        // and modified pills like    [10:00 , 13:00]
+        // It should append first the 13:00 pill, if don't it will not overwrite the 10:00 pill
+    // })
 });
 
 describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/:pillRoutineKey/pill/:pillDatetime", ()=>{
