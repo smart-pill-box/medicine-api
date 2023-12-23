@@ -168,6 +168,56 @@ export const updatePillRoutineSchema = {
     } as const
 }
 
+export const updatePillRoutineStatusSchema = {
+    params: {
+        type: "object",
+        properties: {
+            accountKey: {
+                type: "string",
+                minLength: 36,
+                maxLength: 36
+            },
+            profileKey: {
+                type: "string",
+                minLength: 36,
+                maxLength: 36
+            },
+            pillRoutineKey: {
+                type: "string",
+                minLength: 36,
+                maxLength: 36
+            }
+        },
+        required: ["accountKey", "profileKey", "pillRoutineKey"],
+        additionalProperties: false
+    } as const,
+
+    body: {
+        type: "object",
+        properties: {
+            status: {
+                type: "string",
+                minLength: 0,
+                maxLength: 50
+            }
+        },
+        required: ["status"],
+        additionalProperties: false
+    } as const,
+
+    headers: {
+        type: "object",
+        properties: {
+            authorization: {
+                type: "string"
+            }
+        },
+        required: [
+            "authorization"
+        ]
+    } as const
+}
+
 export const getPillRoutineSchema = {
     params: {
         type: "object",

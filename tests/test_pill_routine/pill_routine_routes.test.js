@@ -718,3 +718,5 @@ describe("PUT /account/:accountKey/profile/:profileKey/pill_routine/:pillRoutine
 });
 
 // TODO test GET pillRoutine route
+
+// TODO test PUT pillRoutine status

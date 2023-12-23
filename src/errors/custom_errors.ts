@@ -189,3 +189,21 @@ export class ExpirationDateCantBeBeforeStartDate extends CustomError {
         super(code, description, statusCode)
     }
 }
+
+export class NotFoundPillRoutineStatus extends CustomError {
+    constructor(status: string){
+        const code = "ERR00017";
+        const description = `The pill routine status ${status} does not exist`
+        const statusCode = 404;
+        super(code, description, statusCode)
+    }
+}
+
+export class InvalidPillRoutineStatusUpdate extends CustomError {
+    constructor(status: string){
+        const code = "ERR00017";
+        const description = `You can't update the status of a pill routine to ${status}`
+        const statusCode = 400;
+        super(code, description, statusCode)
+    }
+}

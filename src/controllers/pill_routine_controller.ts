@@ -1,8 +1,8 @@
 import { QueryRunner } from "typeorm";
 import { FromSchema } from "json-schema-to-ts";
-import { createPillRoutineSchema, updatePillRoutineSchema } from "../schemas/pill_routine_schemas";
+import { createPillRoutineSchema, updatePillRoutineSchema, updatePillRoutineStatusSchema } from "../schemas/pill_routine_schemas";
 import { ModifiedPill, PillRoutine, PillRoutineStatus, PillRoutineStatusEvent, PillRoutineType, PillRoutineVersion, Profile } from "../models";
-import { CantCreateRoutineStartingOnThePast, ExpirationDateCantBeBeforeStartDate, NotFoundPillRoutine, NotFoundPillRoutineType, NotFoundProfile, UnauthorizedError } from "../errors/custom_errors";
+import { CantCreateRoutineStartingOnThePast, ExpirationDateCantBeBeforeStartDate, InvalidPillRoutineStatusUpdate, NotFoundPillRoutine, NotFoundPillRoutineStatus, NotFoundPillRoutineType, NotFoundProfile, UnauthorizedError } from "../errors/custom_errors";
 import { v4 as uuidv4 } from "uuid"
 import RoutineFactory from "../utils/routine_factory";
 import validateToken from "../utils/authorization_validator";
@@ -173,6 +173,7 @@ export default class PillRoutineController {
 
         const pillRoutine = await this.transaction.manager.findOne(PillRoutine, {
             where: {
+                pillRoutineKey: pillRoutineKey,
                 profile: {
                     profileKey: profileKey,
                     account: {
@@ -262,6 +263,65 @@ export default class PillRoutineController {
         await this.transaction.manager.save([pillRoutine, newPillRoutine, pillRoutineVersion])
 
         return newPillRoutine;
+    }
+
+    public async updatePillRoutineStatus(accountKey: string, profileKey: string, pillRoutineKey: string,
+        {
+            status
+        }: FromSchema<typeof updatePillRoutineStatusSchema.body>,
+        authorization: string
+    ): Promise<PillRoutine> {
+        const token = await validateToken(authorization);
+        if (token.sub! != accountKey){
+            throw new UnauthorizedError()
+        }
+
+        const pillRoutine = await this.transaction.manager.findOne(PillRoutine, {
+            where: {
+                pillRoutineKey: pillRoutineKey,
+                profile: {
+                    profileKey: profileKey,
+                    account: {
+                        accountKey: accountKey
+                    }
+                }
+            },
+            relations: {
+                profile: true
+            }
+        })
+
+        if (!pillRoutine){
+            throw new NotFoundPillRoutine();
+        }
+
+        const newRoutineStatus = await this.transaction.manager.findOne(PillRoutineStatus, {
+            where: {
+                enumerator: status
+            }
+        });
+
+        if(!newRoutineStatus){
+            throw new NotFoundPillRoutineStatus(status)
+        }
+
+        const validStatuses = ["canceled"]
+
+        if(!validStatuses.includes(status)){
+            throw new InvalidPillRoutineStatusUpdate(status);
+        }
+
+        pillRoutine.status = newRoutineStatus;
+        const statusEvent = new PillRoutineStatusEvent();
+        statusEvent.pillRoutine = pillRoutine;
+        statusEvent.status = newRoutineStatus;
+        statusEvent.eventDatetime = new Date();
+
+        pillRoutine.statusEvents.push(statusEvent);
+
+        await this.transaction.manager.save([pillRoutine])
+
+        return pillRoutine;
     }
 
 }

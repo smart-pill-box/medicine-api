@@ -5,6 +5,7 @@ import PillRoutineController from '../controllers/pill_routine_controller';
 import { PillRoutineDto } from '../dtos/pill_routine_dto';
 import { ModifiedPill } from '../models';
 import { ModifiedPillDto } from '../dtos/modified_pill_dto';
+import { updatePillStatusSchema } from '../schemas/pill_schemas';
 
 export async function pillRoutineRoutes(server: FastifyInstance){
     server.post<{ 
@@ -85,6 +86,25 @@ export async function pillRoutineRoutes(server: FastifyInstance){
             const newPillRoutine = await pillRoutineController.updatePillRoutine(accountKey, profileKey, pillRoutineKey, req.body, req.headers.authorization);
 
             resp.status(201).send(PillRoutineDto.toClientResponse(newPillRoutine))
+        }
+    );
+
+    server.put<{ 
+        Params: FromSchema<typeof updatePillStatusSchema.params>,
+        Body: FromSchema<typeof updatePillStatusSchema.body>,
+        Headers: FromSchema<typeof updatePillStatusSchema.headers>,
+    }>(
+        "/account/:accountKey/profile/:profileKey/pill_routine/:pillRoutineKey/status",
+        {
+            schema: updatePillStatusSchema
+        },
+        async (req, resp)=>{
+            const pillRoutineController = new PillRoutineController(req.transaction);
+
+            const { accountKey, profileKey, pillRoutineKey } = req.params;
+            const pillRoutine = await pillRoutineController.updatePillRoutineStatus(accountKey, profileKey, pillRoutineKey, req.body, req.headers.authorization);
+
+            resp.status(201).send(PillRoutineDto.toClientResponse(pillRoutine))
         }
     );
 }
