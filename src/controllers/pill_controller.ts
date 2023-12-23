@@ -57,31 +57,43 @@ export default class PillController {
         }
         const pillDatetime = new Date(pillDatetimeStr);
 
-        const routine = RoutineFactory.createRoutine(
-            pillRoutine.pillRoutineType.enumerator
-        );
-        const quantity = routine.getQuantityOfPillsByDatetime(pillDatetime, pillRoutine)
+        
+        let modifiedPill = await this.transaction.manager.findOne(ModifiedPill, {
+            where: {
+                pillDatetime: pillDatetime,
+                pillRoutine: pillRoutine
+            }
+        })
+        
+        if(!modifiedPill){
+            const routine = RoutineFactory.createRoutine(
+                pillRoutine.pillRoutineType.enumerator
+            );
+            
+            const quantity = routine.getQuantityOfPillsByDatetime(pillDatetime, pillRoutine)
+    
+            if (quantity == 0){
+                throw new DontHaveAPillInThatTime(pillDatetimeStr);
+            }
 
-        if (quantity == 0){
-            throw new DontHaveAPillInThatTime(pillDatetimeStr);
+            modifiedPill = new ModifiedPill();
+            modifiedPill.pillDatetime = pillDatetime;
+            modifiedPill.quantity = quantity;
+            modifiedPill.statusEvents = []
         }
-
-        const modifiedPill = new ModifiedPill();
-        modifiedPill.pillDatetime = pillDatetime;
-        modifiedPill.quantity = quantity;
-        modifiedPill.status = modifiedPillStatus;
         
         if(status == "manualyConfirmed" || status == "pillBoxConfirmed"){
             modifiedPill.confirmationDatetime = new Date();
         }
-
+        
+        modifiedPill.status = modifiedPillStatus;
         modifiedPill.pillRoutine = pillRoutine;
 
         const modifiedPillStatusEvent = new ModifiedPillStatusEvent();
         modifiedPillStatusEvent.status = modifiedPillStatus;
         modifiedPillStatusEvent.eventDatetime = new Date();
         
-        modifiedPill.statusEvents = [modifiedPillStatusEvent];
+        modifiedPill.statusEvents.push(modifiedPillStatusEvent);
 
         await this.transaction.manager.save(modifiedPill);
 

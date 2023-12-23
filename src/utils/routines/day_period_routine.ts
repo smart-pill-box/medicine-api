@@ -81,7 +81,7 @@ export class DayPeriodRoutine extends Routine{
 
         let initialDate: Date;
         if (isAfter(fromDate, startDatetime)){
-            const daysUntilNextPill = differenceInDays(startDatetime, fromDate) % periodInDays;
+            const daysUntilNextPill = differenceInDays(fromDate, startDatetime) % periodInDays;
 
             initialDate = addDays(fromDate, daysUntilNextPill);
         }
