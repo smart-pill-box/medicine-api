@@ -7,5 +7,7 @@ namespace NodeJS {
         MEDICINE_API_DB_PASS: string;
         MEDICINE_API_DB_HOST: string;
         MEDICINE_API_DB_PORT: number;
+        CA_BUNDLE_ABS_PATH: string;
+        ENV: "local" | "prod";
     }
   }
