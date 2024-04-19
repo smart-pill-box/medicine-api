@@ -126,6 +126,7 @@ CREATE TABLE pill_reeschadule (
 CREATE TABLE device (
     id                          SERIAL PRIMARY KEY,
     device_key                  CHAR(36) NOT NULL,
+		device_ip										CHAR(15),
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
 );
 

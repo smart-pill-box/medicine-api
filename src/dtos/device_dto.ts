@@ -5,7 +5,8 @@ export class DeviceDto {
         const { deviceKey } = device;
 
         return {
-            deviceKey: deviceKey
+            deviceKey: deviceKey,
+						...(device.deviceIp && {deviceIp: device.deviceIp})
         };
     }
 }

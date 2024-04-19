@@ -1,6 +1,6 @@
 import { Device } from '../models';
 import { FromSchema } from "json-schema-to-ts";
-import { createDeviceSchema } from "../schemas/device_schemas";
+import { createDeviceSchema, updateDeviceIpSchema } from "../schemas/device_schemas";
 import { NotFoundDevice } from "../errors/custom_errors";
 import { QueryRunner } from "typeorm";
 
@@ -35,4 +35,22 @@ export default class DeviceController {
         
         return newDevice;
     } 
+
+		public async updateIp(deviceKey: string, { deviceIp }: FromSchema<typeof updateDeviceIpSchema.body): Promise<Device> {
+        const device = await this.transaction.manager.findOne(Device, {
+            where: {
+                deviceKey: deviceKey
+            }
+        });
+
+        if (!device) {
+            throw new NotFoundDevice(deviceKey);
+        }
+
+				device.deviceIp = deviceIp;
+
+				await this.transaction.manager.save(device);
+
+				return device;
+		}
 }
