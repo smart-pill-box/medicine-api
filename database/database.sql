@@ -103,7 +103,7 @@ CREATE TABLE modified_pill (
     pill_routine_id             INTEGER NOT NULL REFERENCES pill_routine(id),
     status_id                   INTEGER NOT NULL REFERENCES modified_pill_status(id),
     pill_datetime               TIMESTAMP NOT NULL,
-    quantity                    INTEGER NOT NULL,
+    index                       INTEGER NOT NULL,
     confirmation_datetime       TIMESTAMP,
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
 );

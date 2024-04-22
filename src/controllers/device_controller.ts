@@ -36,7 +36,7 @@ export default class DeviceController {
         return newDevice;
     } 
 
-		public async updateIp(deviceKey: string, { deviceIp }: FromSchema<typeof updateDeviceIpSchema.body): Promise<Device> {
+		public async updateIp(deviceKey: string, { deviceIp }: FromSchema<typeof updateDeviceIpSchema.body>): Promise<Device> {
         const device = await this.transaction.manager.findOne(Device, {
             where: {
                 deviceKey: deviceKey

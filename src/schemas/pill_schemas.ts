@@ -17,14 +17,14 @@ export const updatePillStatusSchema = {
                 minLength: 36,
                 maxLength: 36
             },
-            pillDatetime: {
+            pillString: {
                 type: "string",
-                pattern: "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:00\\.000Z$",
-                minLength: 24,
-                maxLength: 24
+                pattern: "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:00\\.000ZI\\d{1,4}$",
+                minLength: 26,
+                maxLength: 29
             }
         },
-        required: ["accountKey", "profileKey", "pillRoutineKey", "pillDatetime"],
+        required: ["accountKey", "profileKey", "pillRoutineKey", "pillString"],
         additionalProperties: false
     } as const,
 
@@ -75,14 +75,14 @@ export const createResschadulePillSchema = {
                 minLength: 36,
                 maxLength: 36
             },
-            pillDatetime: {
+            pillString: {
                 type: "string",
-                pattern: "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:00\\.000Z$",
-                minLength: 24,
-                maxLength: 24
+                pattern: "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:00\\.000ZI\\d{1,4}$",
+                minLength: 26,
+                maxLength: 29
             }
         },
-        required: ["accountKey", "profileKey", "pillRoutineKey", "pillDatetime"],
+        required: ["accountKey", "profileKey", "pillRoutineKey", "pillString"],
         additionalProperties: false
     } as const,
 
@@ -134,14 +134,14 @@ export const getPillReeschaduleSchema = {
                 minLength: 36,
                 maxLength: 36
             },
-            pillDatetime: {
+            pillString: {
                 type: "string",
-                pattern: "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:00\\.000Z$",
-                minLength: 24,
-                maxLength: 24
+                pattern: "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:00\\.000ZI\\d{1,4}$",
+                minLength: 26,
+                maxLength: 29
             }
         },
-        required: ["accountKey", "profileKey", "pillRoutineKey", "pillDatetime"],
+        required: ["accountKey", "profileKey", "pillRoutineKey", "pillString"],
         additionalProperties: false
     } as const,
 

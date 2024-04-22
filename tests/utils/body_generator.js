@@ -103,6 +103,10 @@ function createUpdatePillBody(status, pillDatetime){
     }
 };
 
+function createPillString(pillDatetime, pillIndex){
+	return pillDatetime.toISOString() + 'I' + pillIndex;
+}
+
 function createPillReeschaduleBody(newPillDatetime){
     return {
         newPillDatetime: newPillDatetime
@@ -132,4 +136,5 @@ module.exports = {
     createUpdatePillBody,
     createPillReeschaduleBody,
     createUpdatePillRoutineBody,
+		createPillString,
 }

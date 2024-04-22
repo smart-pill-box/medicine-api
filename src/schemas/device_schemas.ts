@@ -50,7 +50,7 @@ export const updateDeviceIpSchema = {
                 type: "string",
                 minLength: 7, // 0.0.0.0
                 maxLength: 15,
-								patter: "\b(?:\d{1,3}\\.){3}\d{1,3}\b"
+								pattern: "\b(?:\d{1,3}\\.){3}\d{1,3}\b"
             }
         },
         required: [

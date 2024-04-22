@@ -1,5 +1,5 @@
 const { createAccount, createProfile, PillRoutineObjectGenerator, updatePillStatus, createPillReeschadule, updatePillRoutine } = require("../utils/object_generator");
-const { createUpdatePillBody, createPillReeschaduleBody } = require("../utils/body_generator");
+const { createUpdatePillBody, createPillReeschaduleBody, createPillString } = require("../utils/body_generator");
 const { putPillStatus, getModifiedPills, getProfilePills, postPillReeschadule, getPillReeschadule } = require("../utils/route_generator");
 const { createSignedToken } = require("../utils/keycloak_mock");
 const { addDays, isEqual, addMinutes } = require("date-fns");
@@ -180,24 +180,32 @@ describe("GET pills Routes", ()=>{
         );
 
         expect(response.status).toBe(200);
-        expect(response.body.data.length).toBe(4);
+        expect(response.body.data.length).toBe(6);
 
         let pillsToFind = [
             {
                 datetime: (new Date(DateUtils.getDateString(tomorrow) + "T12:00")).toISOString(),
-                quantity: 2
+                index: 0
+            },
+            {
+                datetime: (new Date(DateUtils.getDateString(tomorrow) + "T12:00")).toISOString(),
+                index: 1
             },
             {
                 datetime: (new Date(DateUtils.getDateString(afterAfterTomorrow) + "T12:00")).toISOString(),
-                quantity: 2
+                index: 0
+            },
+            {
+                datetime: (new Date(DateUtils.getDateString(afterAfterTomorrow) + "T12:00")).toISOString(),
+                index: 1
             },
             {
                 datetime: (new Date(DateUtils.getDateString(tomorrow) + "T13:30")).toISOString(),
-                quantity: 1
+                index: 0
             },
             {
                 datetime: (new Date(DateUtils.getDateString(afterAfterTomorrow) + "T13:30")).toISOString(),
-                quantity: 1
+                index: 0
             },
         ]
 
@@ -206,14 +214,15 @@ describe("GET pills Routes", ()=>{
             response.body.data.forEach(pill=>{
                 expect(pill.pillRoutineKey).toBe(pillRoutineKey);
                 expect(pill.status).toBe("pending");
-                if((pill.pillDatetime == pillToFind.datetime) && (pill.quantity == pillToFind.quantity)){
+								console.log(pill);
+                if((pill.pillDatetime == pillToFind.datetime) && (pill.index == pillToFind.index)){
                     foundPills += 1;
                     return
                 }
             })
         });
 
-        expect(foundPills).toBe(4);
+        expect(foundPills).toBe(6);
 
     });
 
@@ -245,24 +254,32 @@ describe("GET pills Routes", ()=>{
         );
 
         expect(response.status).toBe(200);
-        expect(response.body.data.length).toBe(4);
+        expect(response.body.data.length).toBe(6);
 
         let pillsToFind = [
             {
                 datetime: (new Date(DateUtils.getDateString(tomorrow) + "T12:00")).toISOString(),
-                quantity: 2
+                index: 0
+            },
+            {
+                datetime: (new Date(DateUtils.getDateString(tomorrow) + "T12:00")).toISOString(),
+                index: 1
             },
             {
                 datetime: (new Date(DateUtils.getDateString(afterTomorrow) + "T12:00")).toISOString(),
-                quantity: 2
+                index: 0
+            },
+            {
+                datetime: (new Date(DateUtils.getDateString(afterTomorrow) + "T12:00")).toISOString(),
+                index: 1
             },
             {
                 datetime: (new Date(DateUtils.getDateString(tomorrow) + "T13:30")).toISOString(),
-                quantity: 1
+                index: 0
             },
             {
                 datetime: (new Date(DateUtils.getDateString(afterTomorrow) + "T13:30")).toISOString(),
-                quantity: 1
+                index: 0
             },
         ]
 
@@ -271,14 +288,14 @@ describe("GET pills Routes", ()=>{
             response.body.data.forEach(pill=>{
                 expect(pill.status).toBe("pending");
                 expect(pill.pillRoutineKey).toBe(pillRoutineKey);
-                if(pill.pillDatetime == pillToFind.datetime && (pill.quantity == pillToFind.quantity)){
+                if(pill.pillDatetime == pillToFind.datetime && (pill.index == pillToFind.index)){
                     foundPills += 1;
                     return
                 }
             })
         });
 
-        expect(foundPills).toBe(4);
+        expect(foundPills).toBe(6);
     });
 
     test("Return right pills and quantity with dayPeriod and Weekdays Routines", async ()=>{
@@ -312,45 +329,63 @@ describe("GET pills Routes", ()=>{
         );
 
         expect(response.status).toBe(200);
-        expect(response.body.data.length).toBe(4);
+        expect(response.body.data.length).toBe(6);
 
         let pillsToFind = [
             {
                 datetime: (new Date(DateUtils.getDateString(afterTomorrow) + "T12:00")).toISOString(),
-                quantity: 2,
-                routineKey: weekdaysRoutineKey
-            },
-            {
-                datetime: (new Date(DateUtils.getDateString(afterTomorrow) + "T13:30")).toISOString(),
-                quantity: 1,
+                index: 0,
                 routineKey: weekdaysRoutineKey
             },
             {
                 datetime: (new Date(DateUtils.getDateString(afterTomorrow) + "T12:00")).toISOString(),
-                quantity: 2,
-                routineKey: dayPeriodRoutineKey
+                index: 1,
+                routineKey: weekdaysRoutineKey
             },
             {
                 datetime: (new Date(DateUtils.getDateString(afterTomorrow) + "T13:30")).toISOString(),
-                quantity: 1,
+                index: 0,
+                routineKey: weekdaysRoutineKey
+            },
+            {
+                datetime: (new Date(DateUtils.getDateString(tomorrow) + "T12:00")).toISOString(),
+                index: 0,
+                routineKey: dayPeriodRoutineKey
+            },
+            {
+                datetime: (new Date(DateUtils.getDateString(tomorrow) + "T12:00")).toISOString(),
+                index: 1,
+                routineKey: dayPeriodRoutineKey
+            },
+            {
+                datetime: (new Date(DateUtils.getDateString(tomorrow) + "T13:30")).toISOString(),
+                index: 0,
                 routineKey: dayPeriodRoutineKey
             },
         ]
 
         let foundPills = 0;
+				let foundedPill = false;
         pillsToFind.forEach(pillToFind => {
+						console.log("PILL TO FIND IS: ", pillToFind);
             response.body.data.forEach(pill=>{
                 expect(pill.status).toBe("pending");
                 if(
                     pill.pillDatetime == pillToFind.datetime 
-                    && (pill.quantity == pillToFind.quantity)
+                    && (pill.index == pillToFind.index)
                     && (pill.pillRoutineKey == pillToFind.routineKey)
                     ){
-                    foundPills += 1;
+										foundPills += 1;
+										foundedPill = true;
                     return
                 }
-            })
+            });
+						if(!foundedPill){
+							console.log(pillToFind);
+						}
         });
+				
+        expect(foundPills).toBe(6);
     });
 
     test("Substitute routine pills with modified pills on weekdays routines", async ()=>{
@@ -370,20 +405,37 @@ describe("GET pills Routes", ()=>{
             accountKey, profileKey, routineData
         );
 
+				let pillDatetime = DateUtils.sameDateOtherHour(tomorrow, "12:00");
+				let pillString = createPillString(pillDatetime, 0);
         await updatePillStatus(
             accountKey, 
             profileKey, 
             pillRoutineKey, 
             "manualyConfirmed",
-            DateUtils.sameDateOtherHour(tomorrow, "12:00").toISOString()
+           	pillDatetime,
+						0
         );
 
+				pillDatetime = DateUtils.sameDateOtherHour(tomorrow, "12:00");
+				pillString = createPillString(pillDatetime, 1);
         await updatePillStatus(
             accountKey, 
             profileKey, 
             pillRoutineKey, 
             "canceled",
-            DateUtils.sameDateOtherHour(afterTomorrow, "13:30").toISOString()
+						pillDatetime,
+						1
+        );
+
+				pillDatetime = DateUtils.sameDateOtherHour(afterTomorrow, "13:30");
+				pillString = createPillString(pillDatetime, 0);
+        await updatePillStatus(
+            accountKey, 
+            profileKey, 
+            pillRoutineKey, 
+            "canceled",
+						pillDatetime,
+						0
         );
 
         const response = await getProfilePills(
@@ -396,27 +448,37 @@ describe("GET pills Routes", ()=>{
         );
 
         expect(response.status).toBe(200);
-        expect(response.body.data.length).toBe(4);
+        expect(response.body.data.length).toBe(6);
 
         let pillsToFind = [
             {
                 datetime: (new Date(DateUtils.getDateString(tomorrow) + "T12:00")).toISOString(),
-                quantity: 2,
+                index: 0,
                 status: "manualyConfirmed"
             },
             {
+                datetime: (new Date(DateUtils.getDateString(tomorrow) + "T12:00")).toISOString(),
+                index: 1,
+                status: "canceled"
+            },
+            {
                 datetime: (new Date(DateUtils.getDateString(afterTomorrow) + "T12:00")).toISOString(),
-                quantity: 2,
+                index: 0,
+                status: "pending"
+            },
+            {
+                datetime: (new Date(DateUtils.getDateString(afterTomorrow) + "T12:00")).toISOString(),
+                index: 1,
                 status: "pending"
             },
             {
                 datetime: (new Date(DateUtils.getDateString(tomorrow) + "T13:30")).toISOString(),
-                quantity: 1,
+                index: 0,
                 status: "pending"
             },
             {
                 datetime: (new Date(DateUtils.getDateString(afterTomorrow) + "T13:30")).toISOString(),
-                quantity: 1,
+                index: 0,
                 status: "canceled"
             },
         ]
@@ -426,7 +488,7 @@ describe("GET pills Routes", ()=>{
             response.body.data.forEach(pill=>{
                 expect(pill.pillRoutineKey).toBe(pillRoutineKey);
                 if((pill.pillDatetime == pillToFind.datetime)
-                    && (pill.quantity == pillToFind.quantity)
+                    && (pill.index == pillToFind.index)
                     && (pill.status == pillToFind.status)
                     ){
                     foundPills += 1;
@@ -435,7 +497,7 @@ describe("GET pills Routes", ()=>{
             })
         });
 
-        expect(foundPills).toBe(4);
+        expect(foundPills).toBe(6);
     });
 
     test("Substitute routine pills with modified pills on dayPeriod routines", async ()=>{
@@ -452,13 +514,13 @@ describe("GET pills Routes", ()=>{
             accountKey, profileKey, 2, ["12:00", "13:30", "12:00"], startDatetime
         );
 
-
         await updatePillStatus(
             accountKey, 
             profileKey, 
             pillRoutineKey, 
             "manualyConfirmed",
-            DateUtils.sameDateOtherHour(tomorrow, "12:00").toISOString()
+            DateUtils.sameDateOtherHour(tomorrow, "12:00"),
+						0
         );
 
         await updatePillStatus(
@@ -466,7 +528,8 @@ describe("GET pills Routes", ()=>{
             profileKey, 
             pillRoutineKey, 
             "canceled",
-            DateUtils.sameDateOtherHour(afterAfterTomorrow, "13:30").toISOString()
+            DateUtils.sameDateOtherHour(afterAfterTomorrow, "13:30"),
+						0
         );
 
         const response = await getProfilePills(
@@ -479,27 +542,42 @@ describe("GET pills Routes", ()=>{
         );
 
         expect(response.status).toBe(200);
-        expect(response.body.data.length).toBe(4);
+        expect(response.body.data.length).toBe(6);
 
         let pillsToFind = [
             {
                 datetime: (new Date(DateUtils.getDateString(tomorrow) + "T12:00")).toISOString(),
-                quantity: 2,
+                index: 0,
                 status: "manualyConfirmed"
             },
             {
+                datetime: (new Date(DateUtils.getDateString(tomorrow) + "T12:00")).toISOString(),
+                index: 1,
+                status: "pending"
+            },
+            {
                 datetime: (new Date(DateUtils.getDateString(afterAfterTomorrow) + "T12:00")).toISOString(),
-                quantity: 2,
+                index: 0,
+                status: "pending"
+            },
+            {
+                datetime: (new Date(DateUtils.getDateString(afterAfterTomorrow) + "T12:00")).toISOString(),
+                index: 1,
                 status: "pending"
             },
             {
                 datetime: (new Date(DateUtils.getDateString(tomorrow) + "T13:30")).toISOString(),
-                quantity: 1,
+                index: 0,
+                status: "pending"
+            },
+            {
+                datetime: (new Date(DateUtils.getDateString(tomorrow) + "T13:30")).toISOString(),
+                index: 1,
                 status: "pending"
             },
             {
                 datetime: (new Date(DateUtils.getDateString(afterAfterTomorrow) + "T13:30")).toISOString(),
-                quantity: 1,
+                index: 0,
                 status: "canceled"
             },
         ]
@@ -507,7 +585,11 @@ describe("GET pills Routes", ()=>{
         let foundPills = 0;
         pillsToFind.forEach(pillToFind => {
             response.body.data.forEach(pill=>{
-                if((pill.pillDatetime == pillToFind.datetime) && (pill.quantity == pillToFind.quantity)){
+                if(
+									(pill.pillDatetime == pillToFind.datetime) 
+									&& (pill.quantity == pillToFind.quantity)
+									&& (pill.index == pillToFind.index)
+									){
                     foundPills += 1;
                     expect(pill.pillRoutineKey).toBe(pillRoutineKey);
                     expect(pill.status).toBe(pillToFind.status);
@@ -516,7 +598,7 @@ describe("GET pills Routes", ()=>{
             })
         });
 
-        expect(foundPills).toBe(4);
+        expect(foundPills).toBe(6);
     });
 
     test("Substitute routine pills with modified with both weekdays and day period routines", async ()=>{
@@ -545,7 +627,8 @@ describe("GET pills Routes", ()=>{
             profileKey, 
             weekdaysRoutineKey, 
             "manualyConfirmed",
-            DateUtils.sameDateOtherHour(afterAfterTomorrow, "12:00").toISOString()
+            DateUtils.sameDateOtherHour(afterAfterTomorrow, "12:00"),
+						1
         );
 
         await updatePillStatus(
@@ -553,7 +636,8 @@ describe("GET pills Routes", ()=>{
             profileKey, 
             dayPeriodRoutineKey, 
             "canceled",
-            DateUtils.sameDateOtherHour(tomorrow, "13:30").toISOString()
+            DateUtils.sameDateOtherHour(tomorrow, "13:30"),
+						0
         );
 
         const response = await getProfilePills(
@@ -566,30 +650,42 @@ describe("GET pills Routes", ()=>{
         );
 
         expect(response.status).toBe(200);
-        expect(response.body.data.length).toBe(4);
+        expect(response.body.data.length).toBe(6);
 
         let pillsToFind = [
             {
                 datetime: (new Date(DateUtils.getDateString(tomorrow) + "T12:00")).toISOString(),
-                quantity: 2,
+                index: 0,
+                routineKey: dayPeriodRoutineKey,
+                status: "pending"
+            },
+            {
+                datetime: (new Date(DateUtils.getDateString(tomorrow) + "T12:00")).toISOString(),
+                index: 1,
                 routineKey: dayPeriodRoutineKey,
                 status: "pending"
             },
             {
                 datetime: (new Date(DateUtils.getDateString(tomorrow) + "T13:30")).toISOString(),
-                quantity: 1,
+                index: 0,
                 routineKey: dayPeriodRoutineKey,
                 status: "canceled"
             },
             {
                 datetime: (new Date(DateUtils.getDateString(afterAfterTomorrow) + "T12:00")).toISOString(),
-                quantity: 2,
+                index: 0,
+                routineKey: weekdaysRoutineKey,
+                status: "pending"
+            },
+            {
+                datetime: (new Date(DateUtils.getDateString(afterAfterTomorrow) + "T12:00")).toISOString(),
+                index: 1,
                 routineKey: weekdaysRoutineKey,
                 status: "manualyConfirmed"
             },
             {
                 datetime: (new Date(DateUtils.getDateString(afterAfterTomorrow) + "T13:30")).toISOString(),
-                quantity: 1,
+                index: 0,
                 routineKey: weekdaysRoutineKey,
                 status: "pending"
             },
@@ -600,7 +696,7 @@ describe("GET pills Routes", ()=>{
             response.body.data.forEach(pill=>{
                 if(
                     pill.pillDatetime == pillToFind.datetime 
-                    && (pill.quantity == pillToFind.quantity)
+                    && (pill.index == pillToFind.index)
                     && (pill.pillRoutineKey == pillToFind.routineKey)
                     ){
                     expect(pill.status).toBe(pillToFind.status);
@@ -609,6 +705,8 @@ describe("GET pills Routes", ()=>{
                 }
             })
         });
+				
+				expect(foundPills).toBe(6);
     });
 
     test("Just return pills after the start_date of a routine", async ()=>{
@@ -711,7 +809,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         )
 
         const body = createUpdatePillBody("manualyConfirmed");
-        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body, "lalala")
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillString, body, "lalala")
 
 
         expect(response.status).toBe(401)
@@ -737,7 +836,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
     
         const token = createSignedToken(accountKey, {expiresIn: "-1 days"})
         const body = createUpdatePillBody("manualyConfirmed");
-        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body, token)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillString, body, token)
 
         expect(response.status).toBe(401)
         expect(response.body.code).toBe("EXPIRED_ERR");
@@ -761,7 +861,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
 
         const token = createSignedToken(accountKey, {notBefore: "1 days"})
         const body = createUpdatePillBody("manualyConfirmed");
-        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body, token)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillString, body, token)
 
         expect(response.status).toBe(401)
         expect(response.body.code).toBe("NBF_ERR");
@@ -786,7 +887,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
 
         const token = createSignedToken(account2.accountKey);
         const body = createUpdatePillBody("manualyConfirmed");
-        const response = await putPillStatus(account1.accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body, token)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await putPillStatus(account1.accountKey, profileKey, pillRoutineKey, pillString, body, token)
 
         expect(response.status).toBe(401)
         expect(response.body.code).toBe("UNAUTHORIZED")
@@ -809,7 +911,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         )
 
         const body = createUpdatePillBody("manualyConfirmed");
-        const response = await putPillStatus(account2.accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await putPillStatus(account2.accountKey, profileKey, pillRoutineKey, pillString, body)
 
         expect(response.status).toBe(404);
         expect(response.body.code).toBe("ERR00009");
@@ -832,7 +935,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         )
 
         const body = createUpdatePillBody("manualyConfirmed");
-        const response = await putPillStatus(accountKey, profile2.profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await putPillStatus(accountKey, profile2.profileKey, pillRoutineKey, pillString, body)
 
         expect(response.status).toBe(404);
         expect(response.body.code).toBe("ERR00009");
@@ -854,7 +958,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         )
 
         const body = createUpdatePillBody("dont_exist");
-        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillString, body)
 
         expect(response.status).toBe(404);
         expect(response.body.code).toBe("ERR00006");
@@ -971,7 +1076,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         let datetimeStr = pillDatetime.toISOString();
         datetimeStr = datetimeStr.slice(0,5) + "13" + datetimeStr.slice(7)
         const body = createUpdatePillBody("manualyConfirmed");
-        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, datetimeStr, body)
+				const pillString = datetimeStr + "I0";
+        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillString, body)
 
         expect(response.status).toBe(400);
         expect(response.body.code).toBe("ERR00007");
@@ -993,7 +1099,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         )
 
         const body = createUpdatePillBody("manualyConfirmed");
-        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, wrongPillDatetime.toISOString(), body)
+				const pillString = createPillString(wrongPillDatetime, 0);
+        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillString, body)
 
         expect(response.status).toBe(400);
         expect(response.body.code).toBe("ERR00008");
@@ -1015,7 +1122,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         )
 
         const body = createUpdatePillBody("reeschaduled");
-        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillString, body)
 
         expect(response.status).toBe(400);
         expect(response.body.code).toBe("ERR00010");
@@ -1042,7 +1150,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         )
 
         const body = createUpdatePillBody("manualyConfirmed");
-        let response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 0);
+        let response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillString, body)
 
 
         expect(response.status).toBe(201);
@@ -1079,14 +1188,15 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         )
 
         const body = createUpdatePillBody("manualyConfirmed");
-        let response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 0);
+        let response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillString, body);
 
         expect(response.status).toBe(201);
         expect(response.body.status).toBe("manualyConfirmed");
         expect(response.body.confirmationDatetime).toBeDefined();
     });
 
-    test("Create with right quantity with dayPeriod", async ()=>{
+    test("Create with right index with dayPeriod", async ()=>{
         const { accountKey } = await createAccount();
         const { profileKey } = await createProfile(accountKey);
         
@@ -1107,7 +1217,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         )
 
         const body = createUpdatePillBody("manualyConfirmed");
-        let response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 1);
+        let response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillString, body)
 
 
         expect(response.status).toBe(201);
@@ -1118,7 +1229,7 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         expect(response.status).toBe(200);
         expect(response.body.data.length).toBe(1);
         expect(response.body.data[0].status).toBe("manualyConfirmed");
-        expect(response.body.data[0].quantity).toBe(2);
+        expect(response.body.data[0].index).toBe(1);
         expect(response.body.data[0].statusEvents.length).toBe(1);
         expect(response.body.data[0].statusEvents[0].status).toBe("manualyConfirmed");
     });
@@ -1156,7 +1267,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         )
 
         const body = createUpdatePillBody("manualyConfirmed");
-        let response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 0);
+        let response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillString, body)
 
 
         expect(response.status).toBe(201);
@@ -1171,7 +1283,7 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         expect(response.body.data[0].statusEvents[0].status).toBe("manualyConfirmed");
     });
 
-    test("Create with right quantity with weekdays", async ()=>{
+    test("Create with right index with weekdays", async ()=>{
         const { accountKey } = await createAccount();
         const { profileKey } = await createProfile(accountKey);
 
@@ -1204,7 +1316,8 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
         )
 
         const body = createUpdatePillBody("manualyConfirmed");
-        let response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 1);
+        let response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillString, body);
 
 
         expect(response.status).toBe(201);
@@ -1214,7 +1327,7 @@ describe("PUT Pill status /account/:accountKey/profile/:profileKey/pill_routine/
 
         expect(response.status).toBe(200);
         expect(response.body.data.length).toBe(1);
-        expect(response.body.data[0].quantity).toBe(2);
+        expect(response.body.data[0].index).toBe(1);
         expect(response.body.data[0].status).toBe("manualyConfirmed");
         expect(response.body.data[0].statusEvents.length).toBe(1);
         expect(response.body.data[0].statusEvents[0].status).toBe("manualyConfirmed");
@@ -1239,7 +1352,8 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
         const newDatetime = addMinutes(pillDatetime, 10);
 
         const body = createPillReeschaduleBody(newDatetime.toISOString());
-        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body, "lalala")
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillString, body, "lalala")
 
         expect(response.status).toBe(401)
         expect(response.body.code).toBe("JWT_ERROR");
@@ -1266,7 +1380,8 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
         const newDatetime = addMinutes(pillDatetime, 10);
 
         const body = createPillReeschaduleBody(newDatetime.toISOString());
-        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body, token)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillString, body, token)
 
         expect(response.status).toBe(401)
         expect(response.body.code).toBe("EXPIRED_ERR");
@@ -1292,7 +1407,8 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
         const newDatetime = addMinutes(pillDatetime, 10);
 
         const body = createPillReeschaduleBody(newDatetime.toISOString());
-        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body, token)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillString, body, token)
 
         expect(response.status).toBe(401)
         expect(response.body.code).toBe("NBF_ERR");
@@ -1319,7 +1435,8 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
         const newDatetime = addMinutes(pillDatetime, 10);
 
         const body = createPillReeschaduleBody(newDatetime.toISOString());
-        const response = await postPillReeschadule(account1.accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body, token)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await postPillReeschadule(account1.accountKey, profileKey, pillRoutineKey, pillString, body, token)
 
         expect(response.status).toBe(401)
         expect(response.body.code).toBe("UNAUTHORIZED")
@@ -1344,7 +1461,8 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
         const newDatetime = addMinutes(pillDatetime, 10);
 
         const body = createPillReeschaduleBody(newDatetime.toISOString());
-        const response = await postPillReeschadule(account2.accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await postPillReeschadule(account2.accountKey, profileKey, pillRoutineKey, pillString, body)
 
         expect(response.status).toBe(404);
         expect(response.body.code).toBe("ERR00009");
@@ -1369,7 +1487,8 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
         const newDatetime = addMinutes(pillDatetime, 10);
 
         const body = createPillReeschaduleBody(newDatetime.toISOString());
-        const response = await postPillReeschadule(accountKey, profile2.profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await postPillReeschadule(accountKey, profile2.profileKey, pillRoutineKey, pillString, body)
 
         expect(response.status).toBe(404);
         expect(response.body.code).toBe("ERR00009");
@@ -1393,7 +1512,8 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
         const newDatetime = addMinutes(wrongDatetime, 10);
 
         const body = createPillReeschaduleBody(newDatetime.toISOString());
-        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, wrongDatetime.toISOString(), body)
+				const pillString = createPillString(wrongDatetime, 0);
+        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillString, body)
 
         expect(response.status).toBe(404);
         expect(response.body.code).toBe("ERR00012");
@@ -1403,9 +1523,9 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
         const { accountKey } = await createAccount();
         const { profileKey } = await createProfile(accountKey);
 
-        const today = new Date();
+        let today = new Date();
         const tomorrow = addDays(today, 1);
-        const startDatetime = addDays(today, 1);
+        const startDatetime = new Date(tomorrow);
         startDatetime.setUTCHours(0,0,0,0);
         
         const { pillRoutineKey } = await PillRoutineObjectGenerator.createDayPeriodPillRoutine(
@@ -1422,7 +1542,8 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
         const newDatetime = addDays(pillDatetime, 2);
 
         const body = createPillReeschaduleBody(newDatetime.toISOString());
-        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillString, body);
 
         expect(response.status).toBe(408);
         expect(response.body.code).toBe("ERR00011");
@@ -1451,11 +1572,13 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
         const pill2Datetime = addDays(pill1Datetime, 2);
 
         const newDatetime = addDays(pill2Datetime, 1)
+				const pill2String = createPillString(pill2Datetime, 0);
         
-        await createPillReeschadule(accountKey, profileKey, pillRoutineKey, pill2Datetime.toISOString(), newDatetime.toISOString());
+        await createPillReeschadule(accountKey, profileKey, pillRoutineKey, pill2Datetime, 0, newDatetime.toISOString());
 
         const body = createPillReeschaduleBody(newDatetime.toISOString());
-        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pill1Datetime.toISOString(), body)
+				const pill1String = createPillString(pill1Datetime, 0);
+        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pill1String, body)
 
         expect(response.status).toBe(408);
         expect(response.body.code).toBe("ERR00011");
@@ -1481,12 +1604,13 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
             0
         )
 
-        await updatePillStatus(accountKey, profileKey, pillRoutineKey, "canceled", pillDatetime.toISOString());
+        await updatePillStatus(accountKey, profileKey, pillRoutineKey, "canceled", pillDatetime, 0);
 
         const newDatetime = addMinutes(pillDatetime, 15)
         
         const body = createPillReeschaduleBody(newDatetime.toISOString());
-        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 0);
+        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillString, body)
 
         expect(response.status).toBe(400);
         expect(response.body.code).toBe("ERR00013");
@@ -1512,12 +1636,13 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
             0
         )
 
-        await updatePillStatus(accountKey, profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime.toISOString());
+				const pillString = createPillString(pillDatetime, 0);
+        await updatePillStatus(accountKey, profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime, 0);
 
         const newDatetime = addMinutes(pillDatetime, 15)
 
         const body = createPillReeschaduleBody(newDatetime.toISOString());
-        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillString, body)
 
         expect(response.status).toBe(400);
         expect(response.body.code).toBe("ERR00013");
@@ -1545,11 +1670,12 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
         
         const newDatetime1 = addMinutes(pillDatetime, 15);
 
-        await createPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), newDatetime1.toISOString());
+        await createPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime, 0, newDatetime1.toISOString());
 
+				const pillString = createPillString(pillDatetime, 0);
         const newDatetime2 = addMinutes(newDatetime1, 15);
         const body = createPillReeschaduleBody(newDatetime2.toISOString());
-        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+        const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillString, body)
 
         expect(response.status).toBe(400);
         expect(response.body.code).toBe("ERR00013");
@@ -1578,11 +1704,12 @@ describe("POST pill reeschadule /account/:accountKey/profile/:profileKey/pill_ro
         const newDatetime = addMinutes(pillDatetime, 15)
         
         const body = createPillReeschaduleBody(newDatetime.toISOString());
-        let response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString(), body)
+				const pillString = createPillString(pillDatetime, 0);
+        let response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillString, body)
 
         expect(response.status).toBe(201);
 
-        response = await getPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime.toISOString());
+        response = await getPillReeschadule(accountKey, profileKey, pillRoutineKey, pillString);
 
         expect(response.status).toBe(200);
         expect(response.body.reeschaduledPill.pillDatetime).toBe(pillDatetime.toISOString());

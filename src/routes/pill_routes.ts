@@ -13,7 +13,7 @@ export async function pillRoutes(server: FastifyInstance){
         Body: FromSchema<typeof updatePillStatusSchema.body>,
         Headers: FromSchema<typeof updatePillStatusSchema.headers>,
     }>(
-        "/account/:accountKey/profile/:profileKey/pill_routine/:pillRoutineKey/pill/:pillDatetime/status",
+        "/account/:accountKey/profile/:profileKey/pill_routine/:pillRoutineKey/pill/:pillString/status",
         {
             schema: updatePillStatusSchema
         },
@@ -24,7 +24,7 @@ export async function pillRoutes(server: FastifyInstance){
                 req.params.accountKey, 
                 req.params.profileKey,
                 req.params.pillRoutineKey,
-                req.params.pillDatetime,
+                req.params.pillString,
                 req.body,
                 req.headers.authorization
             );
@@ -37,7 +37,7 @@ export async function pillRoutes(server: FastifyInstance){
         Body: FromSchema<typeof createResschadulePillSchema.body>,
         Headers: FromSchema<typeof createResschadulePillSchema.headers>,
     }>(
-        "/account/:accountKey/profile/:profileKey/pill_routine/:pillRoutineKey/pill/:pillDatetime/reeschadule",
+        "/account/:accountKey/profile/:profileKey/pill_routine/:pillRoutineKey/pill/:pillString/reeschadule",
         {
             schema: createResschadulePillSchema
         },
@@ -48,7 +48,7 @@ export async function pillRoutes(server: FastifyInstance){
                 req.params.accountKey, 
                 req.params.profileKey,
                 req.params.pillRoutineKey,
-                req.params.pillDatetime,
+                req.params.pillString,
                 req.body,
                 req.headers.authorization
             );
@@ -60,7 +60,7 @@ export async function pillRoutes(server: FastifyInstance){
             Params: FromSchema<typeof getPillReeschaduleSchema.params>,
             Headers: FromSchema<typeof getPillReeschaduleSchema.headers>,
         }>(
-            "/account/:accountKey/profile/:profileKey/pill_routine/:pillRoutineKey/pill/:pillDatetime/reeschadule",
+            "/account/:accountKey/profile/:profileKey/pill_routine/:pillRoutineKey/pill/:pillString/reeschadule",
             {
                 schema: getPillReeschaduleSchema
             },
@@ -71,7 +71,7 @@ export async function pillRoutes(server: FastifyInstance){
                     req.params.accountKey, 
                     req.params.profileKey,
                     req.params.pillRoutineKey,
-                    req.params.pillDatetime,
+                    req.params.pillString,
                     req.headers.authorization
                 );
     

@@ -1,5 +1,6 @@
 import { isAfter, isEqual } from "date-fns";
 import { ModifiedPill, ModifiedPillStatusEvent, PillRoutine } from "../models";
+import DateUtils from "../utils/date_utils";
 
 export type PillStatus = "pending" | "loaded" | "canceled" | "manualyConfirmed" | "pillBoxConfirmed" | "created" | "reeschaduled"; 
 
@@ -10,16 +11,16 @@ export class Pill {
     reeschaduledTo?: Pill;
     pillRoutineKey: string;
     pillRoutineId: number;
-    quantity: number;
+    index: number;
     name: string;
 
-    constructor (pillDatetime: Date, name: string, pillRoutine: PillRoutine, status: PillStatus, statusEvents: ModifiedPillStatusEvent[], quantity: number, reeschaduledTo?: Pill){
+    constructor (pillDatetime: Date, name: string, pillRoutine: PillRoutine, status: PillStatus, statusEvents: ModifiedPillStatusEvent[], index: number, reeschaduledTo?: Pill){
         this.status = status;
         this.statusEvents = statusEvents;
         this.pillDatetime = pillDatetime;
         this.pillRoutineKey = pillRoutine.pillRoutineKey;
         this.pillRoutineId = pillRoutine.id;
-        this.quantity = quantity
+        this.index = index;
         this.name = name;
     }
 
@@ -30,11 +31,33 @@ export class Pill {
             modifiedPill.pillRoutine,
             modifiedPill.status.enumerator,
             modifiedPill.statusEvents,
-            modifiedPill.quantity
+            modifiedPill.index
         );
 
         return pill;
     }
+
+		static parsePillString(pillString: string): {
+			pillDatetimeStr: string,
+			pillIndex: number
+		} | undefined {
+			const splited = pillString.split("I");
+			let datetime = splited.at(0);
+			let index = splited.at(1);
+
+			if(!datetime || !index){
+				return undefined;
+			}
+
+			if(!DateUtils.isDateStringValid(datetime)){
+				return undefined;
+			}
+
+			return {
+				pillDatetimeStr: datetime,
+				pillIndex: parseInt(index)
+			}
+		}
 
     public isGreaterThen(otherPill: Pill){
         if(this.pillRoutineId > otherPill.pillRoutineId){
@@ -63,6 +86,7 @@ export class Pill {
             this.pillRoutineId == otherPill.pillRoutineId 
             && this.pillRoutineKey == otherPill.pillRoutineKey
             && isEqual(this.pillDatetime, otherPill.pillDatetime)
+						&& this.index == otherPill.index
         )
     }
 }

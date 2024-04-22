@@ -1,4 +1,4 @@
-const { createAccountBody, createProfileBody, createDeviceBody, createProfileDeviceBody, PillRoutineBodyGenerator, createUpdatePillBody, createPillReeschaduleBody, createUpdatePillRoutineBody } =  require("./body_generator");
+const { createAccountBody, createProfileBody, createDeviceBody, createProfileDeviceBody, PillRoutineBodyGenerator, createUpdatePillBody, createPillReeschaduleBody, createUpdatePillRoutineBody, createPillString } =  require("./body_generator");
 const { postAccount, postProfile, postDevice, postProfileDevice, postPillRoutine, putPillStatus, postPillReeschadule, putPillRoutine } =  require("./route_generator");
 
 
@@ -80,20 +80,22 @@ class PillRoutineObjectGenerator{
     }
 }
 
-async function updatePillStatus(accountKey, profileKey, pillRoutineKey, status, pillDatetime){
+async function updatePillStatus(accountKey, profileKey, pillRoutineKey, status, pillDatetime, pillIndex){
     const body = createUpdatePillBody(status);
 
-    const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillDatetime, body);
+		const pillString = createPillString(pillDatetime, pillIndex);
+    const response = await putPillStatus(accountKey, profileKey, pillRoutineKey, pillString, body);
 
     expect(response.status).toBe(201);
 
     return response.body;
 }
 
-async function createPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime, newPillDatetime){
+async function createPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime, pillIndex, newPillDatetime){
     const body = createPillReeschaduleBody(newPillDatetime);
 
-    const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillDatetime, body);
+		const pillString = createPillString(pillDatetime, pillIndex);
+    const response = await postPillReeschadule(accountKey, profileKey, pillRoutineKey, pillString, body);
 
     expect(response.status).toBe(201);
 

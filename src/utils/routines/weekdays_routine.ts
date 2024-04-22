@@ -156,8 +156,10 @@ export class WeekdaysRoutine extends Routine{
                     return
                 }
 
-                const pill = new Pill(pillDatetime, name, pillRoutine, "pending", [], quantity);
-                pills.push(pill);
+								for(let pillIndex = 0; pillIndex < quantity; pillIndex++){
+									const pill = new Pill(pillDatetime, name, pillRoutine, "pending", [], pillIndex);
+									pills.push(pill);
+								}
                 quantity = 1;
             })
         }

@@ -5,7 +5,7 @@ import { DontHaveAPillInThatTime, DuplicatedPill, InvalidPillStatusForReeschadul
 import RoutineFactory from "../utils/routine_factory";
 import validateToken from "../utils/authorization_validator";
 import { updatePillStatusSchema, createResschadulePillSchema } from '../schemas/pill_schemas';
-import { PillStatus } from "../concepts/pill";
+import { Pill, PillStatus } from "../concepts/pill";
 import DateUtils from "../utils/date_utils";
 
 export default class PillController {
@@ -15,7 +15,7 @@ export default class PillController {
         this.transaction = transaction;
     }
 
-    public async updatePillStatus(accountKey: string, profileKey: string, pillRoutineKey: string, pillDatetimeStr: string, {
+    public async updatePillStatus(accountKey: string, profileKey: string, pillRoutineKey: string, pillString: string, {
         status
     }: FromSchema<typeof updatePillStatusSchema.body>, authorization: string){
         const token = await validateToken(authorization);
@@ -52,15 +52,18 @@ export default class PillController {
             throw new InvalidStatusForPillUpdate(status);
         }
 
-        if(!DateUtils.isDateStringValid(pillDatetimeStr)){
-            throw new InvalidTimestampString(pillDatetimeStr);
+				const parsedPillString = Pill.parsePillString(pillString);
+        if(!parsedPillString){
+					  // TODO melhorar isso
+            throw new InvalidTimestampString("erro");
         }
+				let {pillDatetimeStr, pillIndex} = parsedPillString;
         const pillDatetime = new Date(pillDatetimeStr);
 
-        
         let modifiedPill = await this.transaction.manager.findOne(ModifiedPill, {
             where: {
                 pillDatetime: pillDatetime,
+								index: pillIndex,
                 pillRoutine: pillRoutine
             }
         })
@@ -78,7 +81,7 @@ export default class PillController {
 
             modifiedPill = new ModifiedPill();
             modifiedPill.pillDatetime = pillDatetime;
-            modifiedPill.quantity = quantity;
+            modifiedPill.index = pillIndex;
             modifiedPill.statusEvents = []
         }
         
@@ -100,7 +103,7 @@ export default class PillController {
         return modifiedPill;
     }
 
-    public async reeschadulePill(accountKey: string, profileKey: string, pillRoutineKey: string, pillDatetimeStr: string, {
+    public async reeschadulePill(accountKey: string, profileKey: string, pillRoutineKey: string, pillString: string, {
         newPillDatetime: newPillDatetimeStr
     }: FromSchema<typeof createResschadulePillSchema.body>, authorization: string){
         const token = await validateToken(authorization);
@@ -122,10 +125,13 @@ export default class PillController {
         if(!pillRoutine){
             throw new NotFoundPillRoutine();
         }
-
-        if(!DateUtils.isDateStringValid(pillDatetimeStr)){
-            throw new InvalidTimestampString(pillDatetimeStr);
+				
+				const parsedPill = Pill.parsePillString(pillString);
+        if(!parsedPill){
+						// TODO melhorar isso
+            throw new InvalidTimestampString("lalala");
         }
+        const {pillDatetimeStr, pillIndex} = parsedPill;
         const pillDatetime = new Date(pillDatetimeStr);
 
         if(!DateUtils.isDateStringValid(newPillDatetimeStr)){
@@ -144,6 +150,7 @@ export default class PillController {
         const duplicatedPill = await this.transaction.manager.findOne(ModifiedPill, {
             where: {
                 pillDatetime: newPillDatetime,
+								index: pillIndex,
                 pillRoutine: pillRoutine
             }
         })
@@ -154,6 +161,7 @@ export default class PillController {
         let pillToReeschadule = await this.transaction.manager.findOne(ModifiedPill, {
             where: {
                 pillRoutine: pillRoutine,
+								index: pillIndex,
                 pillDatetime: pillDatetime
             }
         });
@@ -167,7 +175,7 @@ export default class PillController {
 
             pillToReeschadule = new ModifiedPill();
             pillToReeschadule.pillRoutine = pillRoutine;
-            pillToReeschadule.quantity = quantity;
+            pillToReeschadule.index = pillIndex;
             pillToReeschadule.status = await this.transaction.manager.findOneOrFail(ModifiedPillStatus, {
                 where: { enumerator: "created" }
             })
@@ -197,7 +205,7 @@ export default class PillController {
         newPill.pillRoutine = pillRoutine;
         newPill.pillDatetime = newPillDatetime;
         newPill.status = pendingStatus;
-        newPill.quantity = pillToReeschadule.quantity;
+        newPill.index = pillToReeschadule.index;
 
         const newPillStatusEvent = new ModifiedPillStatusEvent();
         newPillStatusEvent.eventDatetime = new Date();
@@ -213,20 +221,25 @@ export default class PillController {
         return pillReeschadule;
     }
 
-    public async getPillReeschadule(accountKey: string, profileKey: string, pillRoutineKey: string, pillDatetimeStr: string, authorization: string){
+    public async getPillReeschadule(accountKey: string, profileKey: string, pillRoutineKey: string, pillString: string, authorization: string){
         const token = await validateToken(authorization);
         if (token.sub! != accountKey){
             throw new UnauthorizedError()
         }
 
-        if(!DateUtils.isDateStringValid(pillDatetimeStr)){
-            throw new InvalidTimestampString(pillDatetimeStr);
+				const pillStringParsed = Pill.parsePillString(pillString);
+
+        if(!pillStringParsed){
+						// TODO Melhorar isso
+            throw new InvalidTimestampString("error");
         }
+				const {pillDatetimeStr, pillIndex} = pillStringParsed;
         const pillDatetime = new Date(pillDatetimeStr);
 
         const modifiedPill = await this.transaction.manager.findOne(ModifiedPill, {
             where: {
                 pillDatetime: pillDatetime,
+								index: pillIndex,
                 pillRoutine: {
                     pillRoutineKey: pillRoutineKey,
                     profile: {

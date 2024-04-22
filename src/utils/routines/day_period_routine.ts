@@ -110,8 +110,12 @@ export class DayPeriodRoutine extends Routine{
                     return
                 }
 
-                const pill = new Pill(pillDatetime, name, pillRoutine, "pending", [], quantity);
-                pills.push(pill);
+								for(let pillIndex = 0; pillIndex < quantity; pillIndex++){
+										const pill = new Pill(pillDatetime, name, pillRoutine, "pending", [], pillIndex);
+										console.log("Pill is", pill);
+										console.log("pillIndex is ", pillIndex, " quantity is " + quantity);
+										pills.push(pill);
+								}
                 quantity = 1;
             })
         }

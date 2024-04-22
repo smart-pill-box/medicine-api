@@ -165,7 +165,8 @@ export default class ProfileController {
                 pillRoutine: {
                     id: "ASC"
                 },
-                pillDatetime: "ASC"
+                pillDatetime: "ASC",
+								index: "ASC"
             },
             relations: {
                 pillRoutine: true

@@ -25,7 +25,7 @@ describe("GET /account/:accountKey/profile/:profileKey/pill_routine/:pillRoutine
             12, 
             0
         );
-        await updatePillStatus(accountKey, profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime.toISOString());
+        await updatePillStatus(accountKey, profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime, 0);
 
         const response = await getModifiedPills(accountKey, profileKey, pillRoutineKey, "lalala")
 
@@ -52,7 +52,7 @@ describe("GET /account/:accountKey/profile/:profileKey/pill_routine/:pillRoutine
             12, 
             0
         );
-        await updatePillStatus(accountKey, profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime.toISOString());
+        await updatePillStatus(accountKey, profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime, 0);
 
         const token = createSignedToken(accountKey, {expiresIn: "-1 days"})
         const response = await getModifiedPills(accountKey, profileKey, pillRoutineKey, token)
@@ -80,7 +80,7 @@ describe("GET /account/:accountKey/profile/:profileKey/pill_routine/:pillRoutine
             12, 
             0
         );
-        await updatePillStatus(accountKey, profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime.toISOString());
+        await updatePillStatus(accountKey, profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime, 0);
 
         const token = createSignedToken(accountKey, {notBefore: "1 days"})
         const response = await getModifiedPills(accountKey, profileKey, pillRoutineKey, token)
@@ -110,7 +110,7 @@ describe("GET /account/:accountKey/profile/:profileKey/pill_routine/:pillRoutine
             12, 
             0
         );
-        await updatePillStatus(account1.accountKey, profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime.toISOString());
+        await updatePillStatus(account1.accountKey, profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime, 0);
 
         const token = createSignedToken(account2.accountKey)
         const response = await getModifiedPills(account1.accountKey, profileKey, pillRoutineKey, token)
@@ -141,7 +141,7 @@ describe("GET /account/:accountKey/profile/:profileKey/pill_routine/:pillRoutine
             0
         );
         await updatePillStatus(
-            account1.accountKey, profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime.toISOString()
+            account1.accountKey, profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime, 0
         );
         const response = await getModifiedPills(account2.accountKey, profileKey, pillRoutineKey)
 
@@ -171,7 +171,7 @@ describe("GET /account/:accountKey/profile/:profileKey/pill_routine/:pillRoutine
             0
         );
         await updatePillStatus(
-            accountKey, profile1.profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime.toISOString()
+            accountKey, profile1.profileKey, pillRoutineKey, "manualyConfirmed", pillDatetime, 0
         );
 
         const response = await getModifiedPills(accountKey, profile2.profileKey, pillRoutineKey)
@@ -209,7 +209,8 @@ describe("GET /account/:accountKey/profile/:profileKey/pill_routine/:pillRoutine
             profileKey, 
             pillRoutine2.pillRoutineKey, 
             "manualyConfirmed", 
-            pillDatetime.toISOString()
+            pillDatetime,
+						0
         );
 
         let response = await getModifiedPills(accountKey, profileKey, pillRoutine1.pillRoutineKey)

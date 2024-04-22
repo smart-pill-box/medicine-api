@@ -14,7 +14,7 @@ export class ModifiedPillDto {
             status: modifiedPill.status.enumerator,
             statusEvents: statusEvents,
             pillDatetime: modifiedPill.pillDatetime.toISOString(),
-            quantity: modifiedPill.quantity,
+            index: modifiedPill.index,
             ...(modifiedPill.confirmationDatetime ? { confirmationDatetime: modifiedPill.confirmationDatetime }: {}),
         };
     }

@@ -29,7 +29,7 @@ export class ModifiedPill {
     pillDatetime: Date;
 
     @Column({ type: "integer" })
-    quantity: number;
+    index: number;
 
     @Column({ type: "timestamp", name: "confirmation_datetime" })
     confirmationDatetime: Date;
