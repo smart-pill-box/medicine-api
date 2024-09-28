@@ -35,7 +35,7 @@ export async function deviceRoutes(server: FastifyInstance) {
 		Params: FromSchema<typeof getDeviceSchema.params>
 		Body: FromSchema<typeof updateDeviceIpSchema.body>
 	}>(
-		"/device/:deviceKey/ip",
+		"/device/:deviceKey/device_ip",
 		{
 			schema: updateDeviceIpSchema
 		},

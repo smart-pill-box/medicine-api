@@ -1,12 +1,13 @@
 import { QueryRunner } from "typeorm";
 import { FromSchema } from "json-schema-to-ts";
-import { ModifiedPill, ModifiedPillStatus, ModifiedPillStatusEvent, PillReeschadule, PillRoutine } from "../models";
-import { DontHaveAPillInThatTime, DuplicatedPill, InvalidPillStatusForReeschadule, InvalidStatusForPillUpdate, InvalidTimestampString, NotFoundModifiedPillStatus, NotFoundPill, NotFoundPillReeschadule, NotFoundPillRoutine, NotFoundPillRoutineType, NotFoundProfile, UnauthorizedError } from "../errors/custom_errors";
+import { DevicePill, ModifiedPill, ModifiedPillStatus, ModifiedPillStatusEvent, PillReeschadule, PillRoutine } from "../models";
+import { DontHaveAPillInThatTime, DuplicatedPill, InvalidPillStatusForReeschadule, InvalidStatusForPillUpdate, InvalidTimestampString, NotFoundDevicePill, NotFoundModifiedPillStatus, NotFoundPill, NotFoundPillReeschadule, NotFoundPillRoutine, NotFoundPillRoutineType, NotFoundProfile, UnauthorizedError } from "../errors/custom_errors";
 import RoutineFactory from "../utils/routine_factory";
 import validateToken from "../utils/authorization_validator";
 import { updatePillStatusSchema, createResschadulePillSchema } from '../schemas/pill_schemas';
 import { Pill, PillStatus } from "../concepts/pill";
 import DateUtils from "../utils/date_utils";
+import { devicePillRoutes } from "../routes/device_pill_routes";
 
 export default class PillController {
     transaction: QueryRunner;
@@ -16,7 +17,7 @@ export default class PillController {
     }
 
     public async updatePillStatus(accountKey: string, profileKey: string, pillRoutineKey: string, pillString: string, {
-        status
+        status, devicePillKey
     }: FromSchema<typeof updatePillStatusSchema.body>, authorization: string){
         const token = await validateToken(authorization);
         if (token.sub! != accountKey){
@@ -47,12 +48,29 @@ export default class PillController {
             throw new NotFoundModifiedPillStatus(status);
         }
 
-        const validStatuses = ["canceled", "manualyConfirmed"]
+        const validStatuses = ["canceled", "manualyConfirmed", "loaded"];
         if(!validStatuses.includes(status)){
             throw new InvalidStatusForPillUpdate(status);
         }
+		
+		let devicePill: DevicePill | null | undefined;
+		if(status == "loaded"){
+			if(!devicePillKey){
+				throw new Error("Para confirmar o carregamento, informe a chave da device_pill");
+			}
 
-				const parsedPillString = Pill.parsePillString(pillString);
+			devicePill = await this.transaction.manager.findOne(DevicePill, {
+				where: {
+					devicePillKey: devicePillKey
+				}
+			});
+
+			if(!devicePill){
+				throw new NotFoundDevicePill();
+			}
+		}
+
+		const parsedPillString = Pill.parsePillString(pillString);
         if(!parsedPillString){
 					  // TODO melhorar isso
             throw new InvalidTimestampString("erro");
@@ -63,7 +81,7 @@ export default class PillController {
         let modifiedPill = await this.transaction.manager.findOne(ModifiedPill, {
             where: {
                 pillDatetime: pillDatetime,
-								index: pillIndex,
+				index: pillIndex,
                 pillRoutine: pillRoutine
             }
         })
@@ -97,6 +115,10 @@ export default class PillController {
         modifiedPillStatusEvent.eventDatetime = new Date();
         
         modifiedPill.statusEvents.push(modifiedPillStatusEvent);
+
+		if(devicePill && status == "loaded"){
+			modifiedPill.devicePill = devicePill;
+		}
 
         await this.transaction.manager.save(modifiedPill);
 

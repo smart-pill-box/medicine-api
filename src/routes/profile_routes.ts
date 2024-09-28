@@ -6,6 +6,7 @@ import { ProfileDto } from '../dtos/profile_dto';
 import { DeviceDto } from '../dtos/device_dto';
 import { PillRoutineDto } from '../dtos/pill_routine_dto';
 import { PillDto } from '../dtos/pill_dto';
+import { ProfileDeviceDto } from '../dtos/profile_device_dto';
 
 export async function profileRoutes(server: FastifyInstance){
     server.get<{ 
@@ -47,7 +48,7 @@ export async function profileRoutes(server: FastifyInstance){
                     isLastPage: true,
                     page: 0,
                     limit: 9999,
-                    data: profileDevices.map((device)=>{return DeviceDto.toClientResponse(device)})
+                    data: profileDevices.map((profileDevice)=>{return ProfileDeviceDto.toClientResponse(profileDevice)})
                 }
             );
         }

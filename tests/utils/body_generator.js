@@ -26,19 +26,27 @@ function createProfileBody(name=null, avatarNumber=null){
     }
 };
 
-function createDeviceBody(deviceKey=null){
+function createDeviceBody(deviceKey=null, maxPositions=null){
     if(!deviceKey){
         deviceKey = uuidv4();
     }
+		if(!maxPositions){
+				maxPositions = 20;
+		}
 
     return {
-        deviceKey: deviceKey
+        deviceKey: deviceKey,
+				maxPositions: maxPositions
     }
 };
 
-function createProfileDeviceBody(deviceKey){
+function createProfileDeviceBody(deviceKey, name = null){
+		if(name == null){
+			name = "test name";
+		}
     return {
-        deviceKey: deviceKey
+        deviceKey: deviceKey,
+				name: name,
     }
 };
 

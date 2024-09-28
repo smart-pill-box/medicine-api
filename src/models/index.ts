@@ -2,6 +2,7 @@ import { Account } from "./account";
 import { Profile } from "./profile";
 import { Device } from "./device";
 import { ProfileDevice } from "./profile_device";
+import { DevicePill } from "./device_pill";
 import { PillRoutine } from "./pill_routine";
 import { PillRoutineStatus } from "./pill_routine_status";
 import { PillRoutineStatusEvent } from "./pill_routine_status_event";
@@ -21,6 +22,7 @@ export {
   PillRoutineStatus,
   PillRoutineStatusEvent,
   PillRoutineType,
+	DevicePill,
   ModifiedPillStatus,
   ModifiedPill,
   ModifiedPillStatusEvent,

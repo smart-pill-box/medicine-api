@@ -11,6 +11,7 @@ import { profileDeviceRoutes } from "./routes/profile_device_routes";
 import { pillRoutineRoutes } from "./routes/pill_routine_routes";
 import { pillRoutes } from "./routes/pill_routes";
 import cors from "@fastify/cors"
+import { devicePillRoutes } from "./routes/device_pill_routes";
 
 interface SchemaCompilers {
   body: Ajv;
@@ -110,6 +111,7 @@ AppDataSource.initialize()
     server.register(profileRoutes);
     server.register(deviceRoutes);
     server.register(profileDeviceRoutes);
+	server.register(devicePillRoutes);
     server.register(pillRoutineRoutes);
     server.register(pillRoutes);
 

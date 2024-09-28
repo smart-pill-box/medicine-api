@@ -24,10 +24,16 @@ export const createProfileDeviceSchema = {
                 type: "string",
                 minLength: 36,
                 maxLength: 36
-            }
+            },
+						name: {
+							type: "string",
+							minLength: 0,
+							maxLength: 255
+						}
         },
         required: [
-            "deviceKey"
+            "deviceKey",
+						"name"
         ],
         additionalProperties: false
     } as const

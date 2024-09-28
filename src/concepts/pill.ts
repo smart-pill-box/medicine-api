@@ -67,18 +67,23 @@ export class Pill {
             return false
         }
 
+		if(this.pillDatetime.getTime() == otherPill.pillDatetime.getTime()){
+			if(this.index > otherPill.index){
+				return true;
+			} else {
+				return false;
+			}
+		}
+
         return isAfter(this.pillDatetime, otherPill.pillDatetime);
     }
 
     public isGreaterOrEqual(otherPill: Pill){
-        if(this.pillRoutineId >= otherPill.pillRoutineId){
-            return true
-        }
-        else if(this.pillRoutineId < otherPill.pillRoutineId){
-            return false
-        }
+		if(this.isEqual(otherPill)){
+			return true;
+		}
 
-        return isAfter(this.pillDatetime, otherPill.pillDatetime) || isEqual(this.pillDatetime, otherPill.pillDatetime);
+		return this.isGreaterThen(otherPill);
     }
 
     public isEqual(otherPill: Pill){
@@ -86,7 +91,7 @@ export class Pill {
             this.pillRoutineId == otherPill.pillRoutineId 
             && this.pillRoutineKey == otherPill.pillRoutineKey
             && isEqual(this.pillDatetime, otherPill.pillDatetime)
-						&& this.index == otherPill.index
+			&& this.index == otherPill.index
         )
     }
 }

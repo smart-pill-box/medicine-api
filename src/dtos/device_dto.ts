@@ -6,7 +6,7 @@ export class DeviceDto {
 
         return {
             deviceKey: deviceKey,
-						...(device.deviceIp && {deviceIp: device.deviceIp})
+			...(device.deviceIp && {deviceIp: device.deviceIp}),
         };
     }
 }

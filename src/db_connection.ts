@@ -14,6 +14,7 @@ import {
     ModifiedPillStatusEvent,
     PillReeschadule,
     PillRoutineVersion,
+    DevicePill,
 } from "./models";
 
 let options: DataSourceOptions = {
@@ -39,6 +40,7 @@ let options: DataSourceOptions = {
         ModifiedPillStatusEvent,
         PillReeschadule,
         PillRoutineVersion,
+				DevicePill,
     ],
 };
 

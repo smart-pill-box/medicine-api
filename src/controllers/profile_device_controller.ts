@@ -14,7 +14,8 @@ export default class ProfileDeviceController {
 
     public async createProfileDevice(accountKey: string, profileKey: string,
     { 
-        deviceKey
+        deviceKey,
+				name
     }: FromSchema<typeof createProfileDeviceSchema.body> ) {
         const device = await this.transaction.manager.findOne(Device, {
             where: {
@@ -45,6 +46,7 @@ export default class ProfileDeviceController {
         const profileDevice = new ProfileDevice();
         profileDevice.profile = profile;
         profileDevice.device = device;
+				profileDevice.name = name;
 
         this.transaction.manager.save(profileDevice);
 

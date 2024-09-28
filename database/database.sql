@@ -83,6 +83,31 @@ CREATE TABLE pill_routine_update (
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
 );
 
+CREATE TABLE device (
+    id                          SERIAL PRIMARY KEY,
+    device_key                  CHAR(36) NOT NULL,
+	device_ip					CHAR(15),
+	max_positions				INTEGER NOT NULL,
+    created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
+);
+
+CREATE TABLE device_pill (
+	id											SERIAL PRIMARY KEY,
+	device_id									INTEGER NOT NULL REFERENCES device(id),
+	device_pill_key 							VARCHAR(36) NOT NULL,
+	pill_datetime								TIMESTAMP NOT NULL,
+	position									INTEGER NOT NULL,
+    created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
+);
+
+CREATE TABLE profile_devce (
+    id                          SERIAL PRIMARY KEY,
+		name												VARCHAR(255) NOT NULL,
+    device_id                   INTEGER NOT NULL REFERENCES device(id),
+    profile_id                  INTEGER NOT NULL REFERENCES profile(id),
+    created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
+);
+
 CREATE TABLE modified_pill_status (
     id                          SERIAL PRIMARY KEY,
     enumerator                  VARCHAR(50) NOT NULL,
@@ -102,6 +127,7 @@ CREATE TABLE modified_pill (
     id                          SERIAL PRIMARY KEY,
     pill_routine_id             INTEGER NOT NULL REFERENCES pill_routine(id),
     status_id                   INTEGER NOT NULL REFERENCES modified_pill_status(id),
+	device_pill_id							INTEGER REFERENCES device_pill(id),
     pill_datetime               TIMESTAMP NOT NULL,
     index                       INTEGER NOT NULL,
     confirmation_datetime       TIMESTAMP,
@@ -120,27 +146,5 @@ CREATE TABLE pill_reeschadule (
     id                          SERIAL PRIMARY KEY,
     reeschaduled_pill_id        INTEGER NOT NULL REFERENCES modified_pill(id),
     new_pill_id                 INTEGER NOT NULL REFERENCES modified_pill(id),
-    created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
-);
-
-CREATE TABLE device (
-    id                          SERIAL PRIMARY KEY,
-    device_key                  CHAR(36) NOT NULL,
-		device_ip										CHAR(15),
-    created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
-);
-
-CREATE TABLE profile_device (
-    id                          SERIAL PRIMARY KEY,
-    device_id                   INTEGER NOT NULL REFERENCES device(id),
-    profile_id                  INTEGER NOT NULL REFERENCES profile(id),
-    created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
-);
-
-CREATE TABLE loaded_pill (
-    id                          SERIAL PRIMARY KEY,
-    modified_pill_id            INTEGER NOT NULL REFERENCES modified_pill(id),
-    profile_device_id           INTEGER NOT NULL REFERENCES profile_device(id),
-    position                    INTEGER NOT NULL,
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
 );

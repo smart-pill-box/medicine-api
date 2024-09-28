@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany, OneToOne } from "typeorm";
-import { ProfileDevice } from ".";
+import { DevicePill, ProfileDevice } from ".";
 
 @Entity({ name: "device" })
 export class Device {
@@ -12,8 +12,14 @@ export class Device {
     @Column({ type: "varchar", length: 15, name: "device_ip" })
     deviceIp: string;
 
+	@Column({ type: "integer", name: "max_positions" })
+	maxPositions: number;
+
     @OneToOne((type) => ProfileDevice, (profileDevice) => profileDevice.device, {
         cascade: ["insert", "update"]
     })
     profileDevice: ProfileDevice;
+
+	@OneToMany((type) => DevicePill, (devicePill) => devicePill.device)
+	devicePills: DevicePill[];
 }

@@ -19,5 +19,8 @@ export class ProfileDevice {
     })
     @JoinColumn({ name: "profile_id" })
     profile: Profile;
+
+		@Column({ name: "name", type: "varchar", length: 255 })
+		name: string;
 }
 

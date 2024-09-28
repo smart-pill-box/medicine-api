@@ -1,13 +1,14 @@
-import { Between, MoreThan, MoreThanOrEqual, QueryRunner } from "typeorm";
+import { Between, IsNull, MoreThan, MoreThanOrEqual, Not, QueryRunner } from "typeorm";
 import { createProfileSchema, getProfilePillsSchema } from "../schemas/profile_schemas";
 import { FromSchema } from "json-schema-to-ts";
-import { Account, Device, ModifiedPill, PillRoutine, Profile } from "../models";
+import { Account, Device, ModifiedPill, PillRoutine, Profile, ProfileDevice } from "../models";
 import { v4 as uuidv4 } from "uuid"
 import { NotFoundAccount, NotFoundProfile, UnauthorizedError } from "../errors/custom_errors";
 import validateToken from "../utils/authorization_validator";
 import { Pill } from "../concepts/pill";
 import RoutineFactory from "../utils/routine_factory";
-import { addDays } from "date-fns";
+import { addDays, toDate } from "date-fns";
+import { ProfileDeviceDto } from "../dtos/profile_device_dto";
 
 export default class ProfileController {
     transaction: QueryRunner;
@@ -71,7 +72,7 @@ export default class ProfileController {
         return profile;
     }
 
-    public async getAllProfileDevices(accountKey: string, profileKey: string, authorization: string){
+    public async getAllProfileDevices(accountKey: string, profileKey: string, authorization: string): Promise<ProfileDevice[]> {
         const token = await validateToken(authorization);
         if (token.sub! != accountKey){
             throw new UnauthorizedError()
@@ -90,13 +91,17 @@ export default class ProfileController {
             throw new NotFoundProfile(accountKey, profileKey);
         }
 
-        const profileDevices = await this.transaction.manager.find(Device, {
-            where: {
-                profileDevice: {
-                    profile: profile
-                }
-            }
-        });
+		const profileDevices = await this.transaction.manager.find(ProfileDevice, {
+			where: {
+				profile: profile
+			},
+			relations: {
+				profile: true,
+				device: {
+					devicePills: true
+				}
+			}
+		});
 
         return profileDevices;
     }
@@ -129,28 +134,7 @@ export default class ProfileController {
         return profilePillRoutines;
     };
 
-    public async getProfilePills(accountKey: string, profileKey: string, {
-        fromDate: fromDateString,
-        toDate: toDateString
-    }: FromSchema<typeof getProfilePillsSchema.querystring>, authorization: string){
-        const token = await validateToken(authorization);
-        if (token.sub! != accountKey){
-            throw new UnauthorizedError()
-        }
-
-        const profile = await this.transaction.manager.findOne(Profile, {
-            where: {
-                profileKey: profileKey,
-                account: {
-                    accountKey: accountKey
-                }
-            }
-        });
-
-        if (!profile){
-            throw new NotFoundProfile(accountKey, profileKey);
-        }
-
+	private async getAllPillsOfProfileBetweenDate(fromDateString: string, toDateString: string, profile: Profile){
         const fromDate = new Date(fromDateString);
         const toDate = new Date(toDateString);
 
@@ -166,7 +150,7 @@ export default class ProfileController {
                     id: "ASC"
                 },
                 pillDatetime: "ASC",
-								index: "ASC"
+				index: "ASC"
             },
             relations: {
                 pillRoutine: true
@@ -222,5 +206,64 @@ export default class ProfileController {
         }
         
         return pills;
+	}
+
+	private async getPillsLoadedOnDevice(profile: Profile, deviceKey: string){
+        const modifiedPills = await this.transaction.manager.find(ModifiedPill, {
+            where: {
+                pillRoutine: {
+                    profile: profile
+                },
+				devicePill: {
+					device: {
+						deviceKey: deviceKey
+					}
+				}
+            },
+            relations: {
+				pillRoutine: true
+            }
+        });
+
+		return modifiedPills.map(modifiedPill => Pill.fromModifiedPill(modifiedPill));
+	}
+
+    public async getProfilePills(accountKey: string, profileKey: string, {
+        fromDate: fromDateString,
+        toDate: toDateString,
+		loadedOnDevice
+    }: FromSchema<typeof getProfilePillsSchema.querystring>, authorization: string){
+        const token = await validateToken(authorization);
+        if (token.sub! != accountKey){
+            throw new UnauthorizedError()
+        }
+
+		if((!fromDateString || !toDateString) && !loadedOnDevice){
+			// TODO melhorar
+			throw new Error(" Error query params");
+		}
+
+        const profile = await this.transaction.manager.findOne(Profile, {
+            where: {
+                profileKey: profileKey,
+                account: {
+                    accountKey: accountKey
+                }
+            }
+        });
+
+        if (!profile){
+            throw new NotFoundProfile(accountKey, profileKey);
+        }
+
+		if(loadedOnDevice){
+			return this.getPillsLoadedOnDevice(profile, loadedOnDevice);
+		} else if(fromDateString && toDateString){
+			return this.getAllPillsOfProfileBetweenDate(fromDateString, toDateString, profile);
+		} else {
+			// TODO melhorar
+			throw new Error("Error wtf");
+		}
+
     }
 }

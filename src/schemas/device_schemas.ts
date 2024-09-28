@@ -6,10 +6,15 @@ export const createDeviceSchema = {
                 type: "string",
                 minLength: 36,
                 maxLength: 36
-            }
+            },
+						maxPositions: {
+								type: "integer",
+								minimum: 0
+						}
         },
         required: [
-            "deviceKey"
+            "deviceKey",
+						"maxPositions"
         ],
         additionalProperties: false
     } as const
@@ -50,7 +55,7 @@ export const updateDeviceIpSchema = {
                 type: "string",
                 minLength: 7, // 0.0.0.0
                 maxLength: 15,
-								pattern: "\b(?:\d{1,3}\\.){3}\d{1,3}\b"
+				pattern: "\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b"
             }
         },
         required: [

@@ -35,7 +35,12 @@ export const updatePillStatusSchema = {
                 type: "string",
                 minLength: 1,
                 maxLength: 50
-            }
+            },
+			devicePillKey: {
+				type: "string",
+				minLength: 36,
+				maxLength: 36
+			}
         },
         required: [
             "status"
@@ -56,6 +61,64 @@ export const updatePillStatusSchema = {
     } as const
 }
 
+export const loadPillSchema = {
+    params: {
+        type: "object",
+        properties: {
+            accountKey: {
+                type: "string",
+                minLength: 36,
+                maxLength: 36
+            },
+            profileKey: {
+                type: "string",
+                minLength: 36,
+                maxLength: 36
+            },
+            pillRoutineKey: {
+                type: "string",
+                minLength: 36,
+                maxLength: 36
+            },
+            pillString: {
+                type: "string",
+                pattern: "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:00\\.000ZI\\d{1,4}$",
+                minLength: 26,
+                maxLength: 29
+            }
+        },
+        required: ["accountKey", "profileKey", "pillRoutineKey", "pillString"],
+        additionalProperties: false
+    } as const,
+
+    body: {
+        type: "object",
+        properties: {
+            deviceKey: {
+                type: "string",
+                minLength: 36,
+                maxLength: 36
+            }
+						// TODO NAO SEI OQ COLOCAR AQ, DEVICEPILLKEY?? OU DATETIME?? OU POSITION ????
+        },
+        required: [
+            "deviceKey"
+        ],
+        additionalProperties: false
+    } as const,
+
+    headers: {
+        type: "object",
+        properties: {
+            authorization: {
+                type: "string"
+            }
+        },
+        required: [
+            "authorization"
+        ]
+    } as const
+}
 export const createResschadulePillSchema = {
     params: {
         type: "object",

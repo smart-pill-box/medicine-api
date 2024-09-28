@@ -207,3 +207,13 @@ export class InvalidPillRoutineStatusUpdate extends CustomError {
         super(code, description, statusCode)
     }
 }
+
+export class NotFoundDevicePill extends CustomError {
+    constructor(){
+        const code = "ERR00018";
+        const description = `Device Pill not found`;
+        const statusCode = 404;
+        super(code, description, statusCode)
+    }
+}
+

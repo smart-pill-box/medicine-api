@@ -26,10 +26,11 @@ export default class DeviceController {
         return device;
     }
 
-    public async createDevice({ deviceKey }: FromSchema<typeof createDeviceSchema.body>): Promise<Device>{
+    public async createDevice({ deviceKey, maxPositions }: FromSchema<typeof createDeviceSchema.body>): Promise<Device>{
 
         const newDevice = new Device();
         newDevice.deviceKey = deviceKey;
+				newDevice.maxPositions = maxPositions;
 
         await this.transaction.manager.save(newDevice);
         
