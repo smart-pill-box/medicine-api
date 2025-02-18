@@ -64,3 +64,18 @@ export const updateDeviceIpSchema = {
         additionalProperties: false
     } as const
 }
+
+export const putDevicePoolingSchema = {
+    params: {
+        type: "object",
+        properties: {
+            deviceKey: {
+                type: "string",
+                minLength: 36,
+                maxLength: 36
+            }
+        },
+        required: ["deviceKey"],
+        additionalProperties: false
+    } as const
+}

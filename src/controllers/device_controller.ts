@@ -11,6 +11,24 @@ export default class DeviceController {
         this.transaction = transaction;
     }
 
+    public async pooling(deviceKey: string): Promise<Device> {
+        const device = await this.transaction.manager.findOne(Device, {
+            where: {
+                deviceKey: deviceKey
+            }
+        });
+
+        if (!device) {
+            throw new NotFoundDevice(deviceKey);
+        }
+
+        device.lastPoolingDatetime = new Date();
+
+        await this.transaction.manager.save(device);
+
+        return device;
+    }
+
     public async getDevice(deviceKey: string): Promise<Device>{
 
         const device = await this.transaction.manager.findOne(Device, {
@@ -30,14 +48,15 @@ export default class DeviceController {
 
         const newDevice = new Device();
         newDevice.deviceKey = deviceKey;
-				newDevice.maxPositions = maxPositions;
+		newDevice.maxPositions = maxPositions;
+        newDevice.lastPoolingDatetime = new Date("1970-01-01 00:00:00")
 
         await this.transaction.manager.save(newDevice);
         
         return newDevice;
     } 
 
-		public async updateIp(deviceKey: string, { deviceIp }: FromSchema<typeof updateDeviceIpSchema.body>): Promise<Device> {
+    public async updateIp(deviceKey: string, { deviceIp }: FromSchema<typeof updateDeviceIpSchema.body>): Promise<Device> {
         const device = await this.transaction.manager.findOne(Device, {
             where: {
                 deviceKey: deviceKey
@@ -48,10 +67,10 @@ export default class DeviceController {
             throw new NotFoundDevice(deviceKey);
         }
 
-				device.deviceIp = deviceIp;
+        device.deviceIp = deviceIp;
 
-				await this.transaction.manager.save(device);
+        await this.transaction.manager.save(device);
 
-				return device;
-		}
+        return device;
+    }
 }

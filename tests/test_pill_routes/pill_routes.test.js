@@ -746,14 +746,26 @@ describe("GET pills Routes", ()=>{
         const afterTomorrow = addDays(today, 2);
         const afterAfterTomorrow = addDays(today, 3);
 
-        await updatePillRoutine(accountKey, profileKey, pillRoutineKey, undefined, undefined, afterAfterTomorrow.toISOString());
-
-        const response = await getProfilePills(
+        let response = await getProfilePills(
             accountKey, 
             profileKey, 
             {
                 fromDate: DateUtils.getDateString(today),
-                toDate: DateUtils.getDateString(afterAfterTomorrow),
+                toDate: DateUtils.getDateString(afterTomorrow),
+            }
+        );
+
+        expect(response.status).toBe(200);
+        expect(response.body.data.length).toBe(1);
+
+        await updatePillRoutine(accountKey, profileKey, pillRoutineKey, undefined, undefined, afterAfterTomorrow.toISOString());
+
+        response = await getProfilePills(
+            accountKey, 
+            profileKey, 
+            {
+                fromDate: DateUtils.getDateString(today),
+                toDate: DateUtils.getDateString(afterTomorrow),
             }
         );
 
@@ -763,11 +775,11 @@ describe("GET pills Routes", ()=>{
 
     test("Don't return pills if pillRoutine is already expired", async ()=>{
         let { accountKey } = await createAccount();
-        const {profileKey} = await createProfile(accountKey);
+        const { profileKey } = await createProfile(accountKey);
         const today = new Date();
         const tomorrow = addDays(today, 1);
         const { pillRoutineKey } = await PillRoutineObjectGenerator.createDayPeriodPillRoutine(
-            accountKey, profileKey, 2, ["12:00"], undefined, expirationDatetime=tomorrow.toISOString()
+            accountKey, profileKey, 2, ["12:00"], null, expirationDatetime=tomorrow.toISOString()
         );
 
         const afterTomorrow = addDays(today, 2);

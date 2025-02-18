@@ -57,8 +57,14 @@ async function getDevice(deviceKey){
 async function postDevice(body){
     const response = await request.post("/device").send(body);
 
-    return response
+    return response;
 };
+
+async function putDevicePooling(deviceKey) {
+    const response = await request.put(`/device/${deviceKey}/pooling`)
+
+    return response;
+}
 
 async function postProfileDevice(accountKey, profileKey, body){
     const response = await request.post(
@@ -192,6 +198,7 @@ module.exports = {
     getProfile,
     getProfileDevices,
     getDevice,
+    putDevicePooling,
     postDevice,
     postProfileDevice,
     postPillRoutine,

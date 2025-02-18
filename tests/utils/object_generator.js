@@ -70,7 +70,7 @@ class PillRoutineObjectGenerator{
         periodInDays=null, pillsTimes=null, startDatetime=null, expirationDatetime=null
     ){
         const body = PillRoutineBodyGenerator.createDayPeriodPillRoutineBody(
-            periodInDays, pillsTimes, startDatetime
+            periodInDays, pillsTimes, startDatetime, expirationDatetime
         );
         const response = await postPillRoutine(accounKey, profileKey, body);
 

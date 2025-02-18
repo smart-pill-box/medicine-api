@@ -1,7 +1,7 @@
 import axios from "axios";
 import jwt from "jsonwebtoken"
 import jwksRsa, { JwksClient } from "jwks-rsa"
-import { ExpiredTokenError, MalformatedToken, TokenNotBeforeNBF } from "../errors/custom_errors";
+import { ExpiredTokenError, MalformatedToken, TokenNotBeforeNBF, UnauthorizedError } from "../errors/custom_errors";
 
 const jwksUri = `${process.env.KC_ENDPOINT}/realms/${process.env.KC_REALM}/protocol/openid-connect/certs`;
 
@@ -33,9 +33,10 @@ export default async function validateToken(tokenStr: string): Promise<jwt.JwtPa
         } 
         else if(err.name == "NotBeforeError"){
             throw new TokenNotBeforeNBF();
+        } else {
+            console.log(err.name);
+            throw new UnauthorizedError();
         }
-    
-        throw(err)
     }
 
     

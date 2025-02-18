@@ -69,24 +69,11 @@ CREATE TABLE pill_routine_version (
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
 );
 
-CREATE TABLE pill_routine_update_type(
-    id                          SERIAL PRIMARY KEY,
-    enumerator                  VARCHAR(50) NOT NULL,
-    created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
-);
-
-CREATE TABLE pill_routine_update (
-    id                          SERIAL PRIMARY KEY,
-    pill_routine_id             INTEGER NOT NULL REFERENCES pill_routine(id),
-    update_type_id              INTEGER NOT NULL REFERENCES pill_routine_update_type(id),
-    pill_datetime               TIMESTAMP NOT NULL,
-    created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
-);
-
 CREATE TABLE device (
     id                          SERIAL PRIMARY KEY,
     device_key                  CHAR(36) NOT NULL,
 	device_ip					CHAR(15),
+    last_pooling_datetime       TIMESTAMP NOT NULL,
 	max_positions				INTEGER NOT NULL,
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
 );
@@ -100,9 +87,9 @@ CREATE TABLE device_pill (
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
 );
 
-CREATE TABLE profile_devce (
+CREATE TABLE profile_device (
     id                          SERIAL PRIMARY KEY,
-		name												VARCHAR(255) NOT NULL,
+	name						VARCHAR(255) NOT NULL,
     device_id                   INTEGER NOT NULL REFERENCES device(id),
     profile_id                  INTEGER NOT NULL REFERENCES profile(id),
     created_at                  TIMESTAMP NOT NULL DEFAULT(NOW())
@@ -127,7 +114,7 @@ CREATE TABLE modified_pill (
     id                          SERIAL PRIMARY KEY,
     pill_routine_id             INTEGER NOT NULL REFERENCES pill_routine(id),
     status_id                   INTEGER NOT NULL REFERENCES modified_pill_status(id),
-	device_pill_id							INTEGER REFERENCES device_pill(id),
+	device_pill_id				INTEGER REFERENCES device_pill(id),
     pill_datetime               TIMESTAMP NOT NULL,
     index                       INTEGER NOT NULL,
     confirmation_datetime       TIMESTAMP,

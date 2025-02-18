@@ -1,7 +1,7 @@
 
 import { FastifyInstance } from 'fastify';
 import { FromSchema } from "json-schema-to-ts";
-import { createDevicePillSchema, getDevicePillsSchema, updateDevicePillStatusSchema } from '../schemas/device_pill_schemas';
+import { createDevicePillSchema, getDevicePillsSchema} from '../schemas/device_pill_schemas';
 import DevicePillController from '../controllers/device_pill_controller';
 import { DevicePillDto } from '../dtos/device_pill_dto';
 
@@ -23,24 +23,6 @@ export async function devicePillRoutes(server: FastifyInstance){
 			);
             resp.status(201).send(DevicePillDto.toClientResponse(devicePill));
         }
-	)
-
-	server.put<{
-		Params: FromSchema<typeof updateDevicePillStatusSchema.params>
-	}>(
-		"/device/:deviceKey/device_pill/:devicePillKey",
-		{
-			schama: updateDevicePillStatusSchema
-		},
-		async (req, resp)=>{
-            const devicePillController = new DevicePillController(req.transaction);
-
-			const devicePill = await devicePillController.updateDevicePillStatus(
-                req.params.deviceKey, req.params.devicePillKey,
-                req.body
-            );
-            resp.status(201).send(DevicePillDto.toClientResponse(devicePill));
-		}
 	)
 
     server.get<{ 

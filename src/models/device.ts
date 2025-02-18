@@ -12,6 +12,9 @@ export class Device {
     @Column({ type: "varchar", length: 15, name: "device_ip" })
     deviceIp: string;
 
+    @Column({ type: "timestamp", name: "last_pooling_datetime" })
+    lastPoolingDatetime: Date;
+
 	@Column({ type: "integer", name: "max_positions" })
 	maxPositions: number;
 

@@ -172,7 +172,7 @@ export default class PillController {
         const duplicatedPill = await this.transaction.manager.findOne(ModifiedPill, {
             where: {
                 pillDatetime: newPillDatetime,
-								index: pillIndex,
+				index: pillIndex,
                 pillRoutine: pillRoutine
             }
         })
@@ -255,7 +255,7 @@ export default class PillController {
 						// TODO Melhorar isso
             throw new InvalidTimestampString("error");
         }
-				const {pillDatetimeStr, pillIndex} = pillStringParsed;
+		const {pillDatetimeStr, pillIndex} = pillStringParsed;
         const pillDatetime = new Date(pillDatetimeStr);
 
         const modifiedPill = await this.transaction.manager.findOne(ModifiedPill, {

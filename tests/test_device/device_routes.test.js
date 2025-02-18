@@ -1,5 +1,5 @@
 const { describe } = require("node:test");
-const { postDevice, getDevice } = require("../utils/route_generator");
+const { postDevice, getDevice, putDevicePooling } = require("../utils/route_generator");
 const { v4 : uuidv4 } = require("uuid");
 const { createDeviceBody } = require("../utils/body_generator");
 const { createDevice } = require("../utils/object_generator");
@@ -51,5 +51,18 @@ describe("GET /device/:deviceKey", async ()=>{
 
         expect(response.status).toBe(200);
         expect(response.body.deviceKey).toBe(deviceKey);
+    })
+})
+
+describe("PUT /device/:deviceKey/pooling", async () => {
+    test("Update Last Pooling datetime", async ()=>{
+        const { deviceKey } = await createDevice();
+        let response = await getDevice(deviceKey);
+
+        expect(response.body.lastPoolingDatetime).toBe("1970-01-01T03:00:00.000Z");
+
+        response = await putDevicePooling(deviceKey);
+
+        expect(response.body.lastPoolingDatetime).not.toBe("1970-01-01T03:00:00.000Z");
     })
 })
